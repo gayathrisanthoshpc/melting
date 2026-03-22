@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melting — Describe the chaos. We animate the meltdown.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a08;
+    --cream: #f5f0e8;
+    --yellow: #f5d84a;
+    --orange: #f07a3a;
+    --red: #e03a2a;
+    --blue: #3a6ef0;
+    --muted: #8a8a80;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-serif: 'Instrument Serif', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--black);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 20px; height: 20px;
+    background: var(--yellow);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: multiply;
+  }
+  .cursor.big { width: 60px; height: 60px; }
+  .cursor.red { background: var(--red); }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 40px;
+    mix-blend-mode: multiply;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--black);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--orange); }
+  .nav-cta {
+    background: var(--black);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 100px;
+    cursor: none;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+  .nav-cta:hover { background: var(--orange); transform: scale(1.03); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 120px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: clamp(200px, 30vw, 420px);
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(10,10,8,0.07);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+    animation: bgFloat 8s ease-in-out infinite;
+  }
+  @keyframes bgFloat {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-2deg); }
+    50% { transform: translate(-50%, -52%) rotate(2deg); }
+  }
+
+  .hero-tag {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(80px, 14vw, 200px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title .melt-char {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .hero-title .melt-char:hover {
+    transform: scaleY(1.4) translateY(8px);
+    color: var(--orange);
+  }
+
+  .hero-emoji {
+    font-size: clamp(60px, 10vw, 140px);
+    display: inline-block;
+    animation: meltWobble 3s ease-in-out infinite;
+    transform-origin: top center;
+    vertical-align: middle;
+    margin-left: 16px;
+  }
+  @keyframes meltWobble {
+    0%, 100% { transform: rotate(-4deg) scaleY(1); }
+    25% { transform: rotate(3deg) scaleY(1.05); }
+    50% { transform: rotate(-2deg) scaleY(0.95); }
+    75% { transform: rotate(4deg) scaleY(1.08); }
+  }
+
+  .hero-sub {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(18px, 2.5vw, 28px);
+    color: var(--black);
+    opacity: 0.7;
+    margin-top: 28px;
+    max-width: 540px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-actions {
+    display: flex; align-items: center; gap: 20px;
+    margin-top: 44px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--black);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 16px 36px;
+    border: 2px solid var(--black);
+    border-radius: 100px;
+    cursor: none;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--orange); border-color: var(--orange); transform: translateY(-2px); }
+  .btn-ghost {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--muted);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--black); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 36px; left: 40px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 40px; height: 1px;
+    background: var(--muted);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(1.5); }
+  }
+
+  /* floating blobs */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    animation: blobFloat var(--dur, 7s) ease-in-out infinite;
+  }
+  .blob-1 { width: 300px; height: 300px; background: var(--yellow); opacity: 0.5; top: 10%; right: 8%; --dur: 7s; }
+  .blob-2 { width: 180px; height: 220px; background: var(--orange); opacity: 0.3; bottom: 20%; right: 20%; --dur: 9s; border-radius: 60% 40% 50% 50%; }
+  .blob-3 { width: 120px; height: 120px; background: var(--red); opacity: 0.2; top: 30%; right: 35%; --dur: 6s; }
+  @keyframes blobFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(20px, -30px) rotate(5deg); }
+    66% { transform: translate(-15px, 15px) rotate(-3deg); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how {
+    padding: 120px 40px;
+    background: var(--black);
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+  .how::before {
+    content: 'HOW';
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-display);
+    font-size: 300px;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(245,240,232,0.05);
+    pointer-events: none;
+    line-height: 1;
+  }
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 60px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0;
+  }
+  .step {
+    padding: 40px;
+    border-left: 1px solid rgba(245,240,232,0.1);
+    position: relative;
+    transition: background 0.3s;
+  }
+  .step:hover { background: rgba(245,240,232,0.03); }
+  .step:first-child { border-left: none; }
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 80px;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(245,240,232,0.2);
+    line-height: 1;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .step-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    display: block;
+    animation: stepFloat 4s ease-in-out infinite;
+  }
+  .step:nth-child(2) .step-icon { animation-delay: 0.5s; }
+  .step:nth-child(3) .step-icon { animation-delay: 1s; }
+  .step:nth-child(4) .step-icon { animation-delay: 1.5s; }
+  @keyframes stepFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .step h3 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    color: var(--cream);
+  }
+  .step p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.5);
+  }
+  .step-arrow {
+    position: absolute;
+    right: -16px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--yellow);
+    font-size: 20px;
+    z-index: 2;
+  }
+
+  /* ── DEMO STRIP ── */
+  .demo {
+    padding: 120px 40px;
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .demo-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .demo-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 90px);
+    line-height: 0.95;
+    letter-spacing: 1px;
+    margin-bottom: 60px;
+    max-width: 700px;
+  }
+  .demo-title em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--orange);
+  }
+
+  /* Comic strip mockup */
+  .comic-strip {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 4px;
+    max-width: 900px;
+    border: 3px solid var(--black);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 8px 8px 0 var(--black);
+    animation: comicIn 0.8s 0.3s both;
+  }
+  @keyframes comicIn {
+    from { opacity: 0; transform: translateY(40px) rotate(-1deg); }
+    to { opacity: 1; transform: translateY(0) rotate(0deg); }
+  }
+  .panel {
+    background: white;
+    position: relative;
+    overflow: hidden;
+    border-right: 2px solid var(--black);
+  }
+  .panel:last-child { border-right: none; }
+  .panel-inner {
+    padding: 20px;
+    height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .panel-situation {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .panel-art {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    animation: panelPulse 3s ease-in-out infinite;
+  }
+  .panel:nth-child(2) .panel-art { animation-delay: 0.4s; }
+  .panel:nth-child(3) .panel-art { animation-delay: 0.8s; }
+  @keyframes panelPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .panel-caption {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--black);
+    color: var(--yellow);
+    margin: 0 -20px -20px;
+    padding: 8px 12px;
+  }
+  .panel-1 { background: #fff9e6; }
+  .panel-2 { background: #fff0e6; }
+  .panel-3 { background: #ffe6e6; }
+
+  /* speech bubble */
+  .speech {
+    position: absolute;
+    top: 16px; right: 12px;
+    background: white;
+    border: 2px solid var(--black);
+    border-radius: 12px 12px 12px 0;
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    max-width: 100px;
+    line-height: 1.4;
+    box-shadow: 2px 2px 0 var(--black);
+  }
+
+  .demo-input-area {
+    margin-top: 50px;
+    max-width: 700px;
+  }
+  .demo-input-label {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--black);
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+  .demo-input-box {
+    display: flex;
+    border: 2px solid var(--black);
+    border-radius: 100px;
+    overflow: hidden;
+    background: white;
+    transition: box-shadow 0.2s;
+  }
+  .demo-input-box:focus-within {
+    box-shadow: 6px 6px 0 var(--black);
+  }
+  .demo-input-box input {
+    flex: 1;
+    border: none; outline: none;
+    padding: 16px 24px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    background: transparent;
+    cursor: none;
+  }
+  .demo-input-box button {
+    background: var(--orange);
+    border: none;
+    padding: 14px 28px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 1px;
+    cursor: none;
+    transition: background 0.2s;
+    color: white;
+    border-radius: 0 100px 100px 0;
+  }
+  .demo-input-box button:hover { background: var(--red); }
+
+  /* ── STYLES SECTION ── */
+  .styles {
+    padding: 120px 40px;
+    background: var(--black);
+    color: var(--cream);
+  }
+  .styles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+    margin-top: 60px;
+  }
+  @media (max-width: 600px) { .styles-grid { grid-template-columns: 1fr; } }
+  .style-card {
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    transition: transform 0.3s;
+  }
+  .style-card:hover { transform: scale(1.01); z-index: 2; }
+  .style-card-1 { background: #1a1a14; }
+  .style-card-2 { background: #141a1a; }
+  .style-card-3 { background: #1a1414; }
+  .style-card-4 { background: #14141a; }
+  .style-mood {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .style-name {
+    font-family: var(--font-display);
+    font-size: 36px;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .style-desc {
+    font-size: 13px;
+    color: rgba(245,240,232,0.4);
+    line-height: 1.6;
+    max-width: 280px;
+  }
+  .style-emoji {
+    position: absolute;
+    right: 30px; bottom: 30px;
+    font-size: 48px;
+    opacity: 0.6;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .style-card:hover .style-emoji { opacity: 1; transform: scale(1.2) rotate(10deg); }
+  .style-accent { width: 32px; height: 3px; border-radius: 2px; margin-bottom: 20px; }
+  .style-card-1 .style-accent { background: var(--yellow); }
+  .style-card-2 .style-accent { background: var(--orange); }
+  .style-card-3 .style-accent { background: var(--red); }
+  .style-card-4 .style-accent { background: var(--blue); }
+
+  /* ── CTA ── */
+  .cta {
+    padding: 140px 40px;
+    text-align: center;
+    background: var(--yellow);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta::before {
+    content: '🫠';
+    position: absolute;
+    font-size: 400px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.08;
+    pointer-events: none;
+    animation: ctaFloat 6s ease-in-out infinite;
+  }
+  @keyframes ctaFloat {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-5deg); }
+    50% { transform: translate(-50%, -53%) rotate(5deg); }
+  }
+  .cta h2 {
+    font-family: var(--font-display);
+    font-size: clamp(60px, 10vw, 130px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    color: var(--black);
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .cta p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 20px;
+    color: rgba(10,10,8,0.6);
+    margin-bottom: 44px;
+    position: relative;
+  }
+  .cta-form {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+    border: 2px solid var(--black);
+    border-radius: 100px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 6px 6px 0 var(--black);
+  }
+  .cta-form input {
+    flex: 1;
+    border: none; outline: none;
+    padding: 18px 24px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    background: transparent;
+    cursor: none;
+  }
+  .cta-form button {
+    background: var(--black);
+    color: var(--cream);
+    border: none;
+    padding: 16px 32px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 1px;
+    cursor: none;
+    transition: background 0.2s;
+    border-radius: 0 100px 100px 0;
+  }
+  .cta-form button:hover { background: var(--red); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black);
+    color: var(--cream);
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 2px;
+  }
+  .footer-logo span { color: var(--orange); }
+  footer p {
+    font-size: 12px;
+    color: rgba(245,240,232,0.3);
+  }
+
+  /* ── TICKER ── */
+  .ticker {
+    background: var(--orange);
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 12px 0;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 20s linear infinite;
+  }
+  .ticker-item {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 2px;
+    padding: 0 40px;
+  }
+  .ticker-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 10px;
+    vertical-align: middle;
+    opacity: 0.6;
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .hero, .how, .demo, .styles, .cta { padding-left: 20px; padding-right: 20px; }
+    .steps { grid-template-columns: 1fr; }
+    .step { border-left: none; border-top: 1px solid rgba(245,240,232,0.1); }
+    .step:first-child { border-top: none; }
+    .step-arrow { display: none; }
+    .comic-strip { grid-template-columns: 1fr; }
+    .panel-inner { height: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">MELT<span>ING</span></a>
+  <a class="nav-cta" href="#waitlist">Join the meltdown →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="hero-bg-text">MELT</div>
+
+  <p class="hero-tag">Your feelings, animated</p>
+
+  <h1 class="hero-title">
+    <span class="melt-char">M</span><span class="melt-char">E</span><span class="melt-char">L</span><span class="melt-char">T</span><span class="melt-char">I</span><span class="melt-char">N</span><span class="melt-char">G</span>
+    <span class="hero-emoji">🫠</span>
+  </h1>
+
+  <p class="hero-sub">Describe the chaos.<br>We animate the meltdown.</p>
+
+  <div class="hero-actions">
+    <a href="#demo" class="btn-primary">Try it now →</a>
+    <a href="#how" class="btn-ghost">See how it works ↓</a>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">MY WIFI DIED DURING A JOB INTERVIEW</span><span class="ticker-dot"></span>
+    <span class="ticker-item">I SENT THE WRONG EMAIL TO MY BOSS</span><span class="ticker-dot"></span>
+    <span class="ticker-item">I SLEPT THROUGH MY ALARM AGAIN</span><span class="ticker-dot"></span>
+    <span class="ticker-item">MY CODE WORKED AND I DON'T KNOW WHY</span><span class="ticker-dot"></span>
+    <span class="ticker-item">I SAID "YOU TOO" WHEN THE WAITER SAID ENJOY YOUR MEAL</span><span class="ticker-dot"></span>
+    <span class="ticker-item">MY WIFI DIED DURING A JOB INTERVIEW</span><span class="ticker-dot"></span>
+    <span class="ticker-item">I SENT THE WRONG EMAIL TO MY BOSS</span><span class="ticker-dot"></span>
+    <span class="ticker-item">I SLEPT THROUGH MY ALARM AGAIN</span><span class="ticker-dot"></span>
+    <span class="ticker-item">MY CODE WORKED AND I DON'T KNOW WHY</span><span class="ticker-dot"></span>
+    <span class="ticker-item">I SAID "YOU TOO" WHEN THE WAITER SAID ENJOY YOUR MEAL</span><span class="ticker-dot"></span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <p class="section-label">How it works</p>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num">01</span>
+      <span class="step-icon">✍️</span>
+      <h3>Describe it</h3>
+      <p>Type your situation — messy, long, unhinged. The worse the day, the better the output.</p>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <span class="step-icon">🧠</span>
+      <h3>We read the vibe</h3>
+      <p>Melting detects your emotional tone — stressed, rant mode, sad-funny, or full chaos.</p>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <span class="step-icon">🎨</span>
+      <h3>Art happens</h3>
+      <p>A comic strip or animated scene generates — styled to match your exact flavor of meltdown.</p>
+      <span class="step-arrow">→</span>
+    </div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <span class="step-icon">📤</span>
+      <h3>Share the melt</h3>
+      <p>One tap to share. Post it, send it, or just stare at it and feel understood.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <p class="demo-label">See it in action</p>
+  <h2 class="demo-title">Your chaos,<br><em>beautifully</em><br>animated.</h2>
+
+  <div class="comic-strip">
+    <div class="panel panel-1">
+      <div class="panel-inner">
+        <span class="panel-situation">Panel 1 — The setup</span>
+        <div class="panel-art">🧑‍💻</div>
+        <div class="speech">5 mins before interview...</div>
+        <div class="panel-caption">EVERYTHING IS FINE.</div>
+      </div>
+    </div>
+    <div class="panel panel-2">
+      <div class="panel-inner">
+        <span class="panel-situation">Panel 2 — The moment</span>
+        <div class="panel-art">📶❌</div>
+        <div class="panel-caption">OH NO.</div>
+      </div>
+    </div>
+    <div class="panel panel-3">
+      <div class="panel-inner">
+        <span class="panel-situation">Panel 3 — The reaction</span>
+        <div class="panel-art" style="font-size: 48px; animation: spin 0.5s linear infinite;">🫠</div>
+        <div class="panel-caption">THIS IS FINE.</div>
+      </div>
+    </div>
+  </div>
+
+  <style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
+
+  <div class="demo-input-area">
+    <p class="demo-input-label">What happened to you today?</p>
+    <div class="demo-input-box">
+      <input type="text" id="demo-input" placeholder="My WiFi died 5 minutes before a job interview..." />
+      <button onclick="handleDemoClick()">MELT IT</button>
+    </div>
+  </div>
+</section>
+
+<!-- STYLES -->
+<section class="styles">
+  <p class="section-label">Four flavors of meltdown</p>
+  <div class="styles-grid">
+    <div class="style-card style-card-1">
+      <div class="style-accent"></div>
+      <p class="style-mood">Mood: stressed / overwhelmed</p>
+      <h3 class="style-name">Whiteboard Doodle</h3>
+      <p class="style-desc">Frantic sketches, arrows everywhere, the visual language of someone explaining their chaos to HR.</p>
+      <span class="style-emoji">📋</span>
+    </div>
+    <div class="style-card style-card-2">
+      <div class="style-accent"></div>
+      <p class="style-mood">Mood: absurd / unhinged</p>
+      <h3 class="style-name">Emoji Native</h3>
+      <p class="style-desc">Pure emoji energy, maximalist and chaotic. For situations that have transcended language.</p>
+      <span class="style-emoji">🤯</span>
+    </div>
+    <div class="style-card style-card-3">
+      <div class="style-accent"></div>
+      <p class="style-mood">Mood: rant / rage</p>
+      <h3 class="style-name">Glitch Collage</h3>
+      <p class="style-desc">Torn, distorted, layered. For when you need the visual to match the internal screaming.</p>
+      <span class="style-emoji">💥</span>
+    </div>
+    <div class="style-card style-card-4">
+      <div class="style-accent"></div>
+      <p class="style-mood">Mood: sad but funny</p>
+      <h3 class="style-name">Comic Strip</h3>
+      <p class="style-desc">Deadpan 3-panel format. The classic setup → moment → reaction arc. Timeless pain.</p>
+      <span class="style-emoji">📰</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / WAITLIST -->
+<section class="cta" id="waitlist">
+  <h2>START<br>MELTING</h2>
+  <p>Be first to know when we launch.</p>
+  <div class="cta-form">
+    <input type="email" id="email-input" placeholder="your@email.com" />
+    <button onclick="handleWaitlist()">JOIN</button>
+  </div>
+  <p id="waitlist-msg" style="margin-top:16px; font-size:14px; color: var(--black); opacity:0; transition: opacity 0.4s; position:relative;">
+    🫠 You're on the list. Prepare to melt.
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">MELT<span>ING</span></div>
+  <p>© 2025 Melting. All chaos reserved.</p>
+  <p style="color: rgba(245,240,232,0.2); font-size: 11px;">Describe the chaos. We animate the meltdown.</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, input').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+  document.querySelectorAll('.panel').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('red'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('red'));
+  });
+
+  // Demo input redirect
+  function handleDemoClick() {
+    const val = document.getElementById('demo-input').value.trim();
+    if (val) {
+      document.getElementById('demo-input').value = '';
+      document.getElementById('demo-input').placeholder = 'Coming in Stage 2... 🫠';
+    }
+  }
+  document.getElementById('demo-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleDemoClick();
+  });
+
+  // Waitlist
+  function handleWaitlist() {
+    const val = document.getElementById('email-input').value.trim();
+    if (val && val.includes('@')) {
+      document.getElementById('email-input').value = '';
+      document.getElementById('email-input').placeholder = 'You\'re in!';
+      const msg = document.getElementById('waitlist-msg');
+      msg.style.opacity = '1';
+      setTimeout(() => msg.style.opacity = '0', 4000);
+    }
+  }
+  document.getElementById('email-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleWaitlist();
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.style.opacity = '1';
+    });
+  }, { threshold: 0.1 });
+</script>
+</body>
+</html>
