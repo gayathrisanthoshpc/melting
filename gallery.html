@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melting — The Wall of Melts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #0a0a08; --cream: #f5f0e8; --yellow: #f5d84a;
+    --orange: #f07a3a; --red: #e03a2a; --blue: #3a6ef0; --green: #2abf6e;
+    --muted: #8a8a80;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-serif: 'Instrument Serif', serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+  html, body { min-height: 100%; }
+  body { background: var(--black); color: var(--cream); font-family: var(--font-body); overflow-x: hidden; cursor: none; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.3; }
+
+  .cursor { position:fixed; width:16px; height:16px; background:var(--yellow); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:width .2s,height .2s; mix-blend-mode:difference; }
+  .cursor.big { width:50px; height:50px; }
+
+  /* NAV */
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:20px 40px; border-bottom:1px solid rgba(245,240,232,.06); background:rgba(10,10,8,.85); backdrop-filter:blur(12px); }
+  .nav-logo { font-family:var(--font-display); font-size:24px; letter-spacing:2px; color:var(--cream); text-decoration:none; }
+  .nav-logo span { color:var(--orange); }
+  .nav-right { display:flex; align-items:center; gap:20px; }
+  .nav-link { font-size:13px; color:var(--muted); text-decoration:none; transition:color .2s; }
+  .nav-link:hover { color:var(--cream); }
+  .nav-cta { background:var(--orange); color:white; font-size:13px; font-weight:500; padding:10px 22px; border-radius:100px; text-decoration:none; transition:background .2s; }
+  .nav-cta:hover { background:var(--red); }
+
+  /* HERO */
+  .gallery-hero { padding: 140px 40px 60px; position:relative; overflow:hidden; }
+  .gallery-hero-bg {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-family:var(--font-display); font-size:clamp(160px,25vw,320px);
+    color:transparent; -webkit-text-stroke:1px rgba(245,240,232,.04);
+    pointer-events:none; white-space:nowrap; line-height:1;
+    animation:bgFloat 10s ease-in-out infinite;
+  }
+  @keyframes bgFloat { 0%,100%{transform:translate(-50%,-50%) rotate(-1deg)} 50%{transform:translate(-50%,-52%) rotate(1deg)} }
+  .gallery-hero-tag { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+  .gallery-hero h1 { font-family:var(--font-display); font-size:clamp(60px,10vw,130px); line-height:.9; letter-spacing:2px; margin-bottom:16px; }
+  .gallery-hero h1 em { font-family:var(--font-serif); font-style:italic; color:var(--orange); }
+  .gallery-hero p { font-family:var(--font-serif); font-style:italic; font-size:18px; color:rgba(245,240,232,.4); }
+  .hero-count { display:inline-flex; align-items:center; gap:8px; margin-top:20px; background:rgba(245,240,232,.05); border:1px solid rgba(245,240,232,.1); border-radius:100px; padding:8px 18px; font-size:13px; color:rgba(245,240,232,.5); font-family:var(--font-mono); }
+  .hero-count span { color:var(--yellow); font-weight:500; }
+
+  /* FILTERS */
+  .filters { padding:0 40px 40px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; position:sticky; top:72px; z-index:50; background:rgba(10,10,8,.9); backdrop-filter:blur(12px); padding-top:16px; padding-bottom:16px; border-bottom:1px solid rgba(245,240,232,.06); }
+  .filter-btn { background:rgba(245,240,232,.05); border:1px solid rgba(245,240,232,.1); border-radius:100px; padding:8px 18px; font-size:13px; color:rgba(245,240,232,.5); cursor:none; transition:all .2s; font-family:var(--font-body); }
+  .filter-btn:hover { border-color:rgba(245,240,232,.2); color:var(--cream); }
+  .filter-btn.active { background:var(--cream); color:var(--black); border-color:var(--cream); font-weight:500; }
+  .filter-btn.f-stressed.active    { background:var(--orange); color:white; border-color:var(--orange); }
+  .filter-btn.f-unhinged.active    { background:var(--blue);   color:white; border-color:var(--blue); }
+  .filter-btn.f-rant.active        { background:var(--red);    color:white; border-color:var(--red); }
+  .filter-btn.f-sad.active         { background:var(--green);  color:white; border-color:var(--green); }
+  .sort-sep { width:1px; height:24px; background:rgba(245,240,232,.1); margin:0 4px; }
+  .sort-btn { background:transparent; border:none; font-size:13px; color:rgba(245,240,232,.35); cursor:none; transition:color .2s; font-family:var(--font-body); padding:8px 10px; }
+  .sort-btn:hover, .sort-btn.active { color:var(--cream); }
+
+  /* GALLERY GRID */
+  .gallery-wrap { padding:32px 40px 80px; }
+  .gallery-grid { columns:3 280px; gap:20px; }
+
+  /* MELT CARD */
+  .melt-card { break-inside:avoid; margin-bottom:20px; animation:cardIn .5s both; }
+  @keyframes cardIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .melt-card-inner { background:rgba(245,240,232,.04); border:1px solid rgba(245,240,232,.1); border-radius:16px; overflow:hidden; transition:border-color .2s,transform .2s,box-shadow .2s; cursor:none; }
+  .melt-card-inner:hover { border-color:rgba(245,240,232,.2); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,.3); }
+
+  /* mini comic inside card */
+  .mini-comic { background:white; border-bottom:2px solid rgba(245,240,232,.1); display:grid; }
+  .mini-comic.p3 { grid-template-columns:2fr 1fr 1fr; }
+  .mini-comic.p2 { grid-template-columns:1fr 1fr; }
+  .mini-panel { border-right:1.5px solid #ddd; display:flex; flex-direction:column; min-height:120px; }
+  .mini-panel:last-child { border-right:none; }
+  .mini-panel-art { flex:1; display:flex; align-items:center; justify-content:center; font-size:32px; padding:12px 6px; }
+  .mini-panel-cap { background:#0a0a08; color:#f5d84a; font-family:'Courier New',monospace; font-size:7px; font-weight:bold; letter-spacing:.5px; text-transform:uppercase; padding:5px 8px; line-height:1.3; }
+
+  /* card body */
+  .melt-card-body { padding:14px 16px 12px; }
+  .melt-card-mood { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:100px; font-size:10px; font-weight:500; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+  .melt-card-title { font-family:var(--font-display); font-size:18px; letter-spacing:.5px; line-height:1.1; margin-bottom:8px; color:var(--cream); }
+  .melt-card-situation { font-size:12px; color:rgba(245,240,232,.4); line-height:1.5; font-family:var(--font-serif); font-style:italic; margin-bottom:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .melt-card-footer { display:flex; align-items:center; justify-content:space-between; }
+  .melt-card-time { font-size:11px; color:rgba(245,240,232,.2); font-family:var(--font-mono); }
+
+  /* reactions */
+  .reactions { display:flex; gap:6px; }
+  .reaction-btn { display:flex; align-items:center; gap:4px; background:rgba(245,240,232,.05); border:1px solid rgba(245,240,232,.08); border-radius:100px; padding:4px 10px; font-size:12px; color:rgba(245,240,232,.4); cursor:none; transition:all .2s; }
+  .reaction-btn:hover { background:rgba(245,240,232,.1); color:var(--cream); }
+  .reaction-btn.reacted { background:rgba(245,216,74,.12); border-color:rgba(245,216,74,.3); color:var(--yellow); }
+  .reaction-count { font-size:11px; font-family:var(--font-mono); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:100px 40px; }
+  .empty-emoji { font-size:80px; display:block; margin-bottom:24px; animation:emptyWobble 3s ease-in-out infinite; }
+  @keyframes emptyWobble { 0%,100%{transform:rotate(-5deg) scaleY(1)} 50%{transform:rotate(5deg) scaleY(1.1)} }
+  .empty-state h2 { font-family:var(--font-display); font-size:48px; letter-spacing:1px; margin-bottom:12px; }
+  .empty-state p { font-family:var(--font-serif); font-style:italic; color:rgba(245,240,232,.4); font-size:18px; margin-bottom:32px; }
+  .btn-go-melt { background:var(--orange); color:white; font-family:var(--font-display); font-size:22px; letter-spacing:1px; padding:16px 40px; border-radius:100px; text-decoration:none; transition:background .2s,transform .15s; display:inline-flex; align-items:center; gap:10px; }
+  .btn-go-melt:hover { background:var(--red); transform:translateY(-2px); }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--cream); color:var(--black); padding:14px 28px; border-radius:100px; font-family:var(--font-body); font-size:14px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,.3); transition:transform .4s cubic-bezier(.34,1.56,.64,1); z-index:500; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:768px) {
+    nav { padding:16px 20px; }
+    .gallery-hero { padding:120px 20px 40px; }
+    .filters { padding:12px 20px; top:65px; }
+    .gallery-wrap { padding:24px 20px 60px; }
+    .gallery-grid { columns:1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html">MELT<span>ING</span></a>
+  <div class="nav-right">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-cta" href="generator.html">+ New melt</a>
+  </div>
+</nav>
+
+<section class="gallery-hero">
+  <div class="gallery-hero-bg">WALL</div>
+  <p class="gallery-hero-tag">The gallery</p>
+  <h1>THE WALL<br>OF <em>MELTS</em></h1>
+  <p>Every breakdown. Every cringe. Every "why me."</p>
+  <div class="hero-count">
+    <span id="melt-count">0</span> melts and counting
+  </div>
+</section>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" onclick="setFilter('all', this)">All melts</button>
+  <button class="filter-btn f-stressed"  onclick="setFilter('STRESSED', this)">😤 Stressed</button>
+  <button class="filter-btn f-unhinged"  onclick="setFilter('UNHINGED', this)">🤯 Unhinged</button>
+  <button class="filter-btn f-rant"      onclick="setFilter('RANT MODE', this)">💥 Rant mode</button>
+  <button class="filter-btn f-sad"       onclick="setFilter('SAD BUT FUNNY', this)">😂 Sad but funny</button>
+  <div class="sort-sep"></div>
+  <button class="sort-btn active" id="sort-new" onclick="setSort('new', this)">Newest</button>
+  <button class="sort-btn" id="sort-hot" onclick="setSort('hot', this)">🔥 Hottest</button>
+</div>
+
+<div class="gallery-wrap">
+  <div class="gallery-grid" id="gallery-grid"></div>
+  <div class="empty-state" id="empty-state" style="display:none">
+    <span class="empty-emoji">🫠</span>
+    <h2>NO MELTS YET</h2>
+    <p>Be the first to break down beautifully.</p>
+    <a class="btn-go-melt" href="generator.html"><span>🫠</span> Start melting</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => { cursor.style.left=e.clientX+'px'; cursor.style.top=e.clientY+'px'; });
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+});
+
+// STORAGE HELPERS
+const STORAGE_KEY = 'melting_gallery';
+
+function getMelts() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+
+function saveMelts(melts) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(melts));
+}
+
+// SEED with demo data if empty so gallery never looks dead
+function seedIfEmpty() {
+  const melts = getMelts();
+  if (melts.length > 0) return;
+
+  const demos = [
+    { id:'demo1', mood:'STRESSED', moodColor:'#f07a3a', moodBg:'rgba(240,122,58,0.12)', title:'TECHNICAL DIFFICULTIES: EMOTIONAL EDITION', situation:'My WiFi died 5 minutes before my job interview', panels:[{emoji:'🧑‍💻',bg:'#fffbea',caption:'FAMOUS LAST WORDS.'},{emoji:'📶❌',bg:'#fff4ea',caption:'OH. NO.'},{emoji:'🫠',bg:'#ffeaea',caption:'THIS IS NOT FINE.'}], reactions:{fire:14,skull:8,cry:6}, ts: Date.now() - 3600000*2 },
+    { id:'demo2', mood:'UNHINGED', moodColor:'#3a6ef0', moodBg:'rgba(58,110,240,0.12)', title:'SOCIAL CONTRACT: VIOLATED', situation:'I said "you too" when the waiter said enjoy your meal', panels:[{emoji:'😌',bg:'#eaf4ff',caption:'CONFIDENT. CAPABLE.'},{emoji:'🫣',bg:'#dfeeff',caption:'THE POINT OF NO RETURN.'},{emoji:'🏃',bg:'#d0e4ff',caption:'LEAVING THE COUNTRY NOW.'}], reactions:{fire:22,skull:15,cry:9}, ts: Date.now() - 3600000*5 },
+    { id:'demo3', mood:'RANT MODE', moodColor:'#e03a2a', moodBg:'rgba(224,58,42,0.12)', title:'THE AUDACITY. THE ABSOLUTE AUDACITY.', situation:'My boss scheduled a meeting that could have been an email', panels:[{emoji:'😤',bg:'#fff4f0',caption:'A REASONABLE REQUEST.'},{emoji:'🤡',bg:'#ffe8e0',caption:'ENTER: THE CHAOS GOBLIN.'},{emoji:'💅',bg:'#ffd0c0',caption:'UNBOTHERED. (VERY BOTHERED.)'}], reactions:{fire:31,skull:4,cry:12}, ts: Date.now() - 3600000*8 },
+    { id:'demo4', mood:'SAD BUT FUNNY', moodColor:'#2abf6e', moodBg:'rgba(42,191,110,0.12)', title:'HOPE: A CAUTIONARY TALE', situation:'My alarm didn\'t go off and I have absolutely no explanation', panels:[{emoji:'🙂',bg:'#eafff0',caption:'SPOILER: IT WAS NOT.'},{emoji:'😶',bg:'#d4f5e2',caption:'THE UNIVERSE HAD PLANS.'},{emoji:'😂',bg:'#b8f0d0',caption:"IT'S FUNNY BECAUSE IT'S TRUE."}], reactions:{fire:18,skull:11,cry:27}, ts: Date.now() - 3600000*12 },
+    { id:'demo5', mood:'STRESSED', moodColor:'#f07a3a', moodBg:'rgba(240,122,58,0.12)', title:'ONE PERSON. TOO MANY PROBLEMS.', situation:'My code worked and I genuinely have no idea why', panels:[{emoji:'☕',bg:'#fffbea',caption:'THE CALM BEFORE THE STORM.'},{emoji:'💻💥',bg:'#fff4ea',caption:'AND THERE IT IS.'},{emoji:'🙃',bg:'#ffeaea',caption:'COPING MECHANISM ACTIVATED.'}], reactions:{fire:41,skull:33,cry:19}, ts: Date.now() - 3600000*24 },
+    { id:'demo6', mood:'UNHINGED', moodColor:'#3a6ef0', moodBg:'rgba(58,110,240,0.12)', title:'BRAIN TAKES THE DAY OFF', situation:'I waved back at someone who was not waving at me and we made eye contact for 3 full seconds', panels:[{emoji:'😇',bg:'#eaf4ff',caption:'INNOCENT. UNSUSPECTING.'},{emoji:'😬',bg:'#dfeeff',caption:'THE LOOK ON THEIR FACE.'},{emoji:'🛌',bg:'#d0e4ff',caption:'THE BED IS HOME.'}], reactions:{fire:55,skull:28,cry:34}, ts: Date.now() - 3600000*30 },
+  ];
+  saveMelts(demos);
+}
+
+// STATE
+let currentFilter = 'all';
+let currentSort = 'new';
+let reactedIds = JSON.parse(localStorage.getItem('melting_reacted') || '{}');
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGallery();
+}
+
+function setSort(s, btn) {
+  currentSort = s;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGallery();
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m/60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h/24)}d ago`;
+}
+
+function totalReactions(r) {
+  return (r.fire||0) + (r.skull||0) + (r.cry||0);
+}
+
+function renderGallery() {
+  let melts = getMelts();
+
+  // filter
+  if (currentFilter !== 'all') {
+    melts = melts.filter(m => m.mood === currentFilter);
+  }
+
+  // sort
+  if (currentSort === 'new') {
+    melts.sort((a,b) => b.ts - a.ts);
+  } else {
+    melts.sort((a,b) => totalReactions(b.reactions) - totalReactions(a.reactions));
+  }
+
+  document.getElementById('melt-count').textContent = getMelts().length;
+
+  const grid = document.getElementById('gallery-grid');
+  const empty = document.getElementById('empty-state');
+
+  if (melts.length === 0) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  grid.style.display = '';
+  empty.style.display = 'none';
+  grid.innerHTML = '';
+
+  melts.forEach((melt, i) => {
+    const card = document.createElement('div');
+    card.className = 'melt-card';
+    card.style.animationDelay = (i * 0.05) + 's';
+
+    const panelCount = melt.panels.length;
+    const miniPanelsHtml = melt.panels.map(p => `
+      <div class="mini-panel" style="background:${p.bg}">
+        <div class="mini-panel-art">${p.emoji}</div>
+        <div class="mini-panel-cap">${p.caption}</div>
+      </div>
+    `).join('');
+
+    const reacted = reactedIds[melt.id] || {};
+
+    card.innerHTML = `
+      <div class="melt-card-inner">
+        <div class="mini-comic p${panelCount}">${miniPanelsHtml}</div>
+        <div class="melt-card-body">
+          <div class="melt-card-mood" style="background:${melt.moodBg};color:${melt.moodColor};border:1px solid ${melt.moodColor}44">${melt.mood}</div>
+          <div class="melt-card-title">${melt.title}</div>
+          <div class="melt-card-situation">"${melt.situation}"</div>
+          <div class="melt-card-footer">
+            <div class="reactions">
+              <button class="reaction-btn ${reacted.fire?'reacted':''}" onclick="react('${melt.id}','fire',this)">
+                🔥 <span class="reaction-count" id="r-${melt.id}-fire">${melt.reactions.fire||0}</span>
+              </button>
+              <button class="reaction-btn ${reacted.skull?'reacted':''}" onclick="react('${melt.id}','skull',this)">
+                💀 <span class="reaction-count" id="r-${melt.id}-skull">${melt.reactions.skull||0}</span>
+              </button>
+              <button class="reaction-btn ${reacted.cry?'reacted':''}" onclick="react('${melt.id}','cry',this)">
+                😂 <span class="reaction-count" id="r-${melt.id}-cry">${melt.reactions.cry||0}</span>
+              </button>
+            </div>
+            <div class="melt-card-time">${timeAgo(melt.ts)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  // re-attach cursor listeners to new buttons
+  grid.querySelectorAll('button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+}
+
+function react(id, type, btn) {
+  const melts = getMelts();
+  const melt = melts.find(m => m.id === id);
+  if (!melt) return;
+
+  if (!reactedIds[id]) reactedIds[id] = {};
+
+  if (reactedIds[id][type]) {
+    // un-react
+    melt.reactions[type] = Math.max(0, (melt.reactions[type]||0) - 1);
+    delete reactedIds[id][type];
+    btn.classList.remove('reacted');
+  } else {
+    // react
+    melt.reactions[type] = (melt.reactions[type]||0) + 1;
+    reactedIds[id][type] = true;
+    btn.classList.add('reacted');
+    // little bounce
+    btn.style.transform = 'scale(1.3)';
+    setTimeout(() => btn.style.transform = '', 200);
+  }
+
+  document.getElementById(`r-${id}-${type}`).textContent = melt.reactions[type];
+  saveMelts(melts);
+  localStorage.setItem('melting_reacted', JSON.stringify(reactedIds));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// INIT
+seedIfEmpty();
+renderGallery();
+
+// Listen for new melts saved by generator
+window.addEventListener('storage', e => {
+  if (e.key === STORAGE_KEY) renderGallery();
+});
+</script>
+</body>
+</html>

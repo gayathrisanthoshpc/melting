@@ -162,7 +162,7 @@
 
 <nav>
   <a class="nav-logo" href="index.html">MELT<span>ING</span></a>
-  <a class="nav-back" href="index.html">← Back home</a>
+  <a class="nav-back" href="gallery.html">🖼 Gallery</a>
 </nav>
 
 <main>
@@ -278,6 +278,7 @@
     <div class="bottom-actions">
       <button class="btn-remix" onclick="remixMelt()">🎲 Remix it</button>
       <button class="btn-again" onclick="resetToInput()">↩ New situation</button>
+      <a class="btn-again" href="gallery.html">🖼 See gallery</a>
     </div>
   </div>
 
@@ -386,8 +387,10 @@ function startMelting() {
   runLoadingAnim();
   setTimeout(() => {
     stopLoadingAnim();
-    buildOutput(currentMood);
+    const builtPanels = buildOutput(currentMood);
+    saveToGallery(currentMood, currentTitle, currentSituation, builtPanels);
     showState('output');
+    setTimeout(() => showToast('🫠 Saved to the gallery!'), 900);
   }, 2800);
 }
 
@@ -462,6 +465,7 @@ function buildOutput(mood) {
       document.getElementById(id).classList.toggle('active', i===0);
     });
   }, 600);
+  return panels;
 }
 
 // ── SHARE & EXPORT ──
@@ -524,6 +528,29 @@ function showState(s) {
   if (s==='input')   document.getElementById('state-input').style.display   = 'block';
   if (s==='loading') document.getElementById('state-loading').style.display = 'flex';
   if (s==='output')  document.getElementById('state-output').style.display  = 'flex';
+}
+
+// SAVE TO GALLERY
+function saveToGallery(mood, title, situation, panels) {
+  try {
+    const lib = LIBRARY[mood];
+    const melts = JSON.parse(localStorage.getItem('melting_gallery') || '[]');
+    const newMelt = {
+      id: 'melt_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      mood,
+      moodColor: lib.moodColor,
+      moodBg: lib.moodBg,
+      title,
+      situation,
+      panels: panels.map(p => ({ emoji: p.emoji, bg: p.bg, caption: p.caption })),
+      reactions: { fire: 0, skull: 0, cry: 0 },
+      ts: Date.now()
+    };
+    melts.unshift(newMelt);
+    // keep max 100 melts
+    if (melts.length > 100) melts.splice(100);
+    localStorage.setItem('melting_gallery', JSON.stringify(melts));
+  } catch(e) { /* storage full or unavailable */ }
 }
 
 function resetToInput() {

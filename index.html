@@ -699,7 +699,10 @@
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="#">MELT<span>ING</span></a>
-  <a class="nav-cta" href="#waitlist">Join the meltdown →</a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <a href="gallery.html" style="font-size:13px;color:#8a8a80;text-decoration:none;transition:color .2s" onmouseenter="this.style.color='#f5f0e8'" onmouseleave="this.style.color='#8a8a80'">🖼 Gallery</a>
+    <a class="nav-cta" href="#waitlist">Join the meltdown →</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -719,7 +722,7 @@
   <p class="hero-sub">Describe the chaos.<br>We animate the meltdown.</p>
 
   <div class="hero-actions">
-    <a href="generator.html" class="btn-primary">Try it now →</a>
+    <a href="#demo" class="btn-primary">Try it now →</a>
     <a href="#how" class="btn-ghost">See how it works ↓</a>
   </div>
 
@@ -815,7 +818,7 @@
     <p class="demo-input-label">What happened to you today?</p>
     <div class="demo-input-box">
       <input type="text" id="demo-input" placeholder="My WiFi died 5 minutes before a job interview..." />
-      <button onclick="window.location.href='generator.html'">MELT IT</button>
+      <button onclick="handleDemoClick()">MELT IT</button>
     </div>
   </div>
 </section>
