@@ -4,156 +4,144 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Melting — Generate Your Meltdown</title>
+<meta name="description" content="Describe your situation. Get a comic strip. Share the chaos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- html2canvas for image export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --black: #0a0a08; --cream: #f5f0e8; --yellow: #f5d84a;
-    --orange: #f07a3a; --red: #e03a2a; --blue: #3a6ef0; --green: #2abf6e;
-    --muted: #8a8a80;
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-serif: 'Instrument Serif', serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'Courier New', monospace;
-  }
-  html, body { height: 100%; }
-  body { background: var(--black); color: var(--cream); font-family: var(--font-body); overflow-x: hidden; cursor: none; min-height: 100vh; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 1000; opacity: 0.3; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0a0a08;--cream:#f5f0e8;--yellow:#f5d84a;
+  --orange:#f07a3a;--red:#e03a2a;--blue:#3a6ef0;--green:#2abf6e;
+  --muted:#8a8a80;
+  --fd:'Bebas Neue',sans-serif;
+  --fs:'Instrument Serif',serif;
+  --fb:'DM Sans',sans-serif;
+  --fm:'Courier New',monospace;
+}
+html,body{min-height:100%}
+body{background:var(--black);color:var(--cream);font-family:var(--fb);overflow-x:hidden;cursor:none;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:900;opacity:.3}
 
-  .cursor { position: fixed; width: 16px; height: 16px; background: var(--yellow); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .2s,height .2s; mix-blend-mode: difference; }
-  .cursor.big { width: 50px; height: 50px; }
+.cursor{position:fixed;width:16px;height:16px;background:var(--yellow);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:difference}
+.cursor.big{width:50px;height:50px}
 
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; border-bottom: 1px solid rgba(245,240,232,.06); background: rgba(10,10,8,.85); backdrop-filter: blur(12px); }
-  .nav-logo { font-family: var(--font-display); font-size: 24px; letter-spacing: 2px; color: var(--cream); text-decoration: none; }
-  .nav-logo span { color: var(--orange); }
-  .nav-back { font-size: 13px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .2s; }
-  .nav-back:hover { color: var(--cream); }
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid rgba(245,240,232,.06);background:rgba(10,10,8,.88);backdrop-filter:blur(12px)}
+.nav-logo{font-family:var(--fd);font-size:24px;letter-spacing:2px;color:var(--cream);text-decoration:none}
+.nav-logo span{color:var(--orange)}
+.nav-links{display:flex;align-items:center;gap:20px}
+.nav-link{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:none}
+.nav-link:hover{color:var(--cream)}
 
-  main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 120px 24px 80px; }
+main{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:120px 24px 80px}
 
-  /* INPUT */
-  #state-input { width: 100%; max-width: 740px; animation: fadeUp .6s both; }
-  .input-heading { text-align: center; margin-bottom: 40px; }
-  .input-heading h1 { font-family: var(--font-display); font-size: clamp(52px,9vw,110px); line-height: .9; letter-spacing: 2px; margin-bottom: 12px; }
-  .wobble { display: inline-block; animation: wobble 3s ease-in-out infinite; transform-origin: top center; }
-  @keyframes wobble { 0%,100%{transform:rotate(-3deg) scaleY(1)} 25%{transform:rotate(2deg) scaleY(1.06)} 50%{transform:rotate(-1deg) scaleY(.94)} 75%{transform:rotate(3deg) scaleY(1.04)} }
-  .input-heading p { font-family: var(--font-serif); font-style: italic; font-size: 18px; color: rgba(245,240,232,.45); }
-  .input-card { background: rgba(245,240,232,.04); border: 1px solid rgba(245,240,232,.12); border-radius: 20px; padding: 28px; transition: border-color .3s,box-shadow .3s; }
-  .input-card:focus-within { border-color: rgba(240,122,58,.5); box-shadow: 0 0 0 4px rgba(240,122,58,.08); }
-  .input-card textarea { width: 100%; background: transparent; border: none; outline: none; font-family: var(--font-body); font-size: 18px; line-height: 1.7; color: var(--cream); resize: none; min-height: 160px; cursor: none; }
-  .input-card textarea::placeholder { color: rgba(245,240,232,.2); }
-  .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(245,240,232,.07); }
-  .char-count { font-size: 12px; color: rgba(245,240,232,.25); font-family: var(--font-mono); }
-  .char-count.warn { color: var(--orange); }
-  .btn-melt { background: var(--orange); color: white; border: none; padding: 14px 36px; border-radius: 100px; font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; cursor: none; transition: background .2s,transform .15s,box-shadow .2s; display: flex; align-items: center; gap: 10px; }
-  .btn-melt:hover:not(:disabled) { background: var(--red); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(224,58,42,.35); }
-  .btn-melt:disabled { opacity: .35; }
-  .melt-icon { font-size: 20px; animation: meltIcon 2s ease-in-out infinite; }
-  @keyframes meltIcon { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.15) translateY(2px)} }
-  .examples { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .example-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,240,232,.25); width: 100%; margin-bottom: 2px; }
-  .chip { background: rgba(245,240,232,.05); border: 1px solid rgba(245,240,232,.1); border-radius: 100px; padding: 8px 16px; font-size: 13px; color: rgba(245,240,232,.5); cursor: none; transition: background .2s,color .2s,border-color .2s; white-space: nowrap; }
-  .chip:hover { background: rgba(240,122,58,.1); border-color: rgba(240,122,58,.3); color: var(--orange); }
+/* INPUT STATE */
+#state-input{width:100%;max-width:740px;animation:fadeUp .6s both}
+.input-heading{text-align:center;margin-bottom:40px}
+.input-heading h1{font-family:var(--fd);font-size:clamp(52px,9vw,110px);line-height:.9;letter-spacing:2px;margin-bottom:12px}
+.wobble{display:inline-block;animation:wobble 3s ease-in-out infinite;transform-origin:top center}
+@keyframes wobble{0%,100%{transform:rotate(-3deg) scaleY(1)}25%{transform:rotate(2deg) scaleY(1.06)}50%{transform:rotate(-1deg) scaleY(.94)}75%{transform:rotate(3deg) scaleY(1.04)}}
+.input-heading p{font-family:var(--fs);font-style:italic;font-size:18px;color:rgba(245,240,232,.45)}
 
-  /* LOADING */
-  #state-loading { display: none; width: 100%; max-width: 500px; text-align: center; flex-direction: column; align-items: center; gap: 32px; }
-  .melt-loader { position: relative; width: 120px; height: 140px; margin: 0 auto; }
-  .melt-face { font-size: 80px; display: block; animation: meltFace 1.5s ease-in-out infinite; line-height: 1; }
-  @keyframes meltFace { 0%{transform:scaleY(1) rotate(0deg)} 25%{transform:scaleY(1.1) rotate(-3deg)} 50%{transform:scaleY(.9) rotate(2deg);filter:blur(.5px)} 75%{transform:scaleY(1.15) rotate(-2deg)} 100%{transform:scaleY(1) rotate(0deg)} }
-  .melt-drips { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
-  .drip { width: 6px; background: var(--orange); border-radius: 0 0 100px 100px; animation: drip var(--d,1.2s) var(--delay,0s) ease-in infinite; }
-  .drip:nth-child(1){--d:1.1s;--delay:0s;height:20px}.drip:nth-child(2){--d:1.4s;--delay:.2s;height:30px}.drip:nth-child(3){--d:1s;--delay:.4s;height:16px}.drip:nth-child(4){--d:1.6s;--delay:.1s;height:24px}.drip:nth-child(5){--d:1.2s;--delay:.3s;height:18px}
-  @keyframes drip { 0%{transform:scaleY(.3);opacity:.4} 50%{transform:scaleY(1.2);opacity:1} 100%{transform:scaleY(.3);opacity:.4} }
-  .loading-messages { height: 28px; overflow: hidden; position: relative; }
-  .loading-msg { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; color: var(--cream); position: absolute; width: 100%; text-align: center; opacity: 0; transform: translateY(20px); transition: opacity .4s,transform .4s; }
-  .loading-msg.active { opacity: 1; transform: translateY(0); }
-  .loading-bar-wrap { width: 100%; height: 3px; background: rgba(245,240,232,.08); border-radius: 100px; overflow: hidden; max-width: 320px; margin: 0 auto; }
-  .loading-bar { height: 100%; background: var(--orange); border-radius: 100px; width: 0%; transition: width .4s ease; }
+.input-card{background:rgba(245,240,232,.04);border:1px solid rgba(245,240,232,.12);border-radius:20px;padding:28px;transition:border-color .3s,box-shadow .3s}
+.input-card:focus-within{border-color:rgba(240,122,58,.5);box-shadow:0 0 0 4px rgba(240,122,58,.08)}
+.input-card textarea{width:100%;background:transparent;border:none;outline:none;font-family:var(--fb);font-size:18px;line-height:1.7;color:var(--cream);resize:none;min-height:160px;cursor:none}
+.input-card textarea::placeholder{color:rgba(245,240,232,.2)}
+.input-footer{display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid rgba(245,240,232,.07)}
+.char-count{font-size:12px;color:rgba(245,240,232,.25);font-family:var(--fm)}
+.char-count.warn{color:var(--orange)}
+.btn-melt{background:var(--orange);color:white;border:none;padding:14px 36px;border-radius:100px;font-family:var(--fd);font-size:22px;letter-spacing:1px;cursor:none;transition:background .2s,transform .15s,box-shadow .2s;display:flex;align-items:center;gap:10px}
+.btn-melt:hover:not(:disabled){background:var(--red);transform:translateY(-2px);box-shadow:0 8px 24px rgba(224,58,42,.35)}
+.btn-melt:disabled{opacity:.35}
+.melt-icon{font-size:20px;animation:meltIcon 2s ease-in-out infinite}
+@keyframes meltIcon{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.15) translateY(2px)}}
 
-  /* OUTPUT */
-  #state-output { display: none; width: 100%; max-width: 960px; flex-direction: column; align-items: center; gap: 28px; }
-  .output-header { text-align: center; animation: fadeUp .5s both; }
-  .mood-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 100px; font-size: 12px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
-  .output-header h2 { font-family: var(--font-display); font-size: clamp(32px,5vw,60px); letter-spacing: 1px; line-height: 1; }
+.examples{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}
+.example-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,240,232,.25);width:100%;margin-bottom:2px}
+.chip{background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);border-radius:100px;padding:8px 16px;font-size:13px;color:rgba(245,240,232,.5);cursor:none;transition:background .2s,color .2s,border-color .2s;white-space:nowrap}
+.chip:hover{background:rgba(240,122,58,.1);border-color:rgba(240,122,58,.3);color:var(--orange)}
 
-  .comic-container { width: 100%; animation: comicReveal .7s .2s both; }
-  @keyframes comicReveal { from{opacity:0;transform:translateY(40px) rotate(-.5deg)} to{opacity:1;transform:translateY(0)} }
+/* LOADING STATE */
+#state-loading{display:none;width:100%;max-width:500px;text-align:center;flex-direction:column;align-items:center;gap:32px}
+.melt-face{font-size:80px;display:block;animation:meltFace 1.5s ease-in-out infinite;line-height:1}
+@keyframes meltFace{0%{transform:scaleY(1) rotate(0deg)}25%{transform:scaleY(1.1) rotate(-3deg)}50%{transform:scaleY(.9) rotate(2deg);filter:blur(.5px)}75%{transform:scaleY(1.15) rotate(-2deg)}100%{transform:scaleY(1) rotate(0deg)}}
+.melt-drips{display:flex;justify-content:center;gap:8px;margin-top:8px}
+.drip{width:6px;background:var(--orange);border-radius:0 0 100px 100px;animation:drip var(--d,1.2s) var(--delay,0s) ease-in infinite}
+.drip:nth-child(1){--d:1.1s;--delay:0s;height:20px}.drip:nth-child(2){--d:1.4s;--delay:.2s;height:30px}.drip:nth-child(3){--d:1s;--delay:.4s;height:16px}.drip:nth-child(4){--d:1.6s;--delay:.1s;height:24px}.drip:nth-child(5){--d:1.2s;--delay:.3s;height:18px}
+@keyframes drip{0%{transform:scaleY(.3);opacity:.4}50%{transform:scaleY(1.2);opacity:1}100%{transform:scaleY(.3);opacity:.4}}
+.loading-messages{height:28px;overflow:hidden;position:relative}
+.loading-msg{font-family:var(--fd);font-size:22px;letter-spacing:1px;color:var(--cream);position:absolute;width:100%;text-align:center;opacity:0;transform:translateY(20px);transition:opacity .4s,transform .4s}
+.loading-msg.active{opacity:1;transform:translateY(0)}
+.loading-bar-wrap{width:100%;height:3px;background:rgba(245,240,232,.08);border-radius:100px;overflow:hidden;max-width:320px;margin:0 auto}
+.loading-bar{height:100%;background:var(--orange);border-radius:100px;width:0%;transition:width .5s ease}
 
-  /* The shareable comic card — this is what gets exported */
-  .comic-card {
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 3px solid #0a0a08;
-    box-shadow: 10px 10px 0 rgba(245,240,232,.15);
-    font-family: 'Courier New', monospace;
-  }
-  .comic-strip { display: grid; }
-  .comic-strip.panels-3 { grid-template-columns: 2fr 1.2fr 1.2fr; }
-  .comic-strip.panels-2 { grid-template-columns: 1fr 1fr; }
-  .panel { border-right: 2.5px solid #0a0a08; position: relative; overflow: hidden; min-height: 240px; display: flex; flex-direction: column; }
-  .panel:last-child { border-right: none; }
-  .panel-top { padding: 14px 14px 0; flex: 1; display: flex; flex-direction: column; }
-  .panel-label { font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #888; margin-bottom: 10px; }
-  .panel-art { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 56px; padding: 8px 0; position: relative; }
-  .panel-speech { position: absolute; top: 0; right: 0; background: white; border: 2px solid black; border-radius: 10px 10px 10px 0; padding: 5px 9px; font-family: 'Courier New', monospace; font-size: 9px; font-weight: bold; max-width: 110px; line-height: 1.4; box-shadow: 2px 2px 0 black; text-transform: uppercase; color: black; }
-  .panel-caption { background: #0a0a08; color: #f5d84a; font-family: 'Courier New', monospace; font-size: 10px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; padding: 8px 14px; border-top: 2px solid black; }
+/* OUTPUT STATE */
+#state-output{display:none;width:100%;max-width:960px;flex-direction:column;align-items:center;gap:28px}
+.output-header{text-align:center;animation:fadeUp .5s both}
+.mood-badge{display:inline-flex;align-items:center;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.output-title{font-family:var(--fd);font-size:clamp(28px,5vw,56px);letter-spacing:1px;line-height:1;margin-bottom:8px}
+.output-situation{font-family:var(--fs);font-style:italic;font-size:15px;color:rgba(245,240,232,.4);max-width:600px;line-height:1.5}
 
-  /* Comic footer branding (shows in export) */
-  .comic-footer { background: #0a0a08; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 2px solid #0a0a08; }
-  .comic-footer-logo { font-family: 'Bebas Neue', 'Arial Black', sans-serif; font-size: 18px; letter-spacing: 2px; color: #f5f0e8; }
-  .comic-footer-logo span { color: #f07a3a; }
-  .comic-footer-url { font-family: 'Courier New', monospace; font-size: 10px; color: rgba(245,240,232,.35); letter-spacing: 1px; }
+.comic-container{width:100%;animation:comicReveal .7s .2s both}
+@keyframes comicReveal{from{opacity:0;transform:translateY(40px) rotate(-.5deg)}to{opacity:1;transform:translateY(0)}}
 
-  .style-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(245,240,232,.06); border: 1px solid rgba(245,240,232,.12); border-radius: 100px; padding: 6px 14px; font-size: 12px; color: rgba(245,240,232,.5); font-family: var(--font-mono); }
+/* Comic card — exported as image */
+.comic-card{background:white;border-radius:16px;overflow:hidden;border:3px solid #0a0a08;box-shadow:10px 10px 0 rgba(245,240,232,.12);font-family:'Courier New',monospace}
+.comic-strip{display:grid}
+.comic-strip.panels-3{grid-template-columns:2fr 1.2fr 1.2fr}
+.panel{border-right:2.5px solid #0a0a08;position:relative;overflow:hidden;min-height:240px;display:flex;flex-direction:column}
+.panel:last-child{border-right:none}
+.panel-top{padding:14px 14px 0;flex:1;display:flex;flex-direction:column}
+.panel-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:10px}
+.panel-art{flex:1;display:flex;align-items:center;justify-content:center;font-size:56px;padding:8px 0;position:relative}
+.panel-speech{position:absolute;top:0;right:0;background:white;border:2px solid black;border-radius:10px 10px 10px 0;padding:5px 9px;font-size:9px;font-weight:bold;max-width:110px;line-height:1.4;box-shadow:2px 2px 0 black;text-transform:uppercase;color:black}
+.panel-caption{background:#0a0a08;color:#f5d84a;font-size:10px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-top:2px solid black}
+.comic-footer-bar{background:#0a0a08;display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+.comic-footer-logo{font-family:'Bebas Neue','Arial Black',sans-serif;font-size:18px;letter-spacing:2px;color:#f5f0e8}
+.comic-footer-logo span{color:#f07a3a}
+.comic-footer-tag{font-size:10px;color:rgba(245,240,232,.3);letter-spacing:1px}
 
-  /* Share panel */
-  .share-panel { width: 100%; animation: fadeUp .5s .4s both; }
-  .share-panel-inner { background: rgba(245,240,232,.04); border: 1px solid rgba(245,240,232,.1); border-radius: 16px; padding: 24px; }
-  .share-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: 16px; }
+.style-tag{display:inline-flex;align-items:center;background:rgba(245,240,232,.06);border:1px solid rgba(245,240,232,.12);border-radius:100px;padding:6px 14px;font-size:12px;color:rgba(245,240,232,.45);font-family:var(--fm)}
 
-  .share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (max-width: 500px) { .share-grid { grid-template-columns: 1fr; } }
+/* Share panel */
+.share-panel{width:100%;max-width:600px;animation:fadeUp .5s .4s both}
+.share-panel-inner{background:rgba(245,240,232,.04);border:1px solid rgba(245,240,232,.1);border-radius:16px;padding:24px}
+.share-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,240,232,.3);margin-bottom:16px}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.share-btn{display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:12px;border:1px solid rgba(245,240,232,.1);background:rgba(245,240,232,.04);cursor:none;transition:all .2s;text-decoration:none}
+.share-btn:hover{transform:translateY(-2px)}
+.share-btn-icon{font-size:20px;flex-shrink:0;width:26px;text-align:center}
+.share-btn-title{font-size:14px;font-weight:500;color:var(--cream);display:block}
+.share-btn-sub{font-size:11px;color:rgba(245,240,232,.3);font-family:var(--fm);display:block}
+.share-btn.dl{border-color:rgba(245,216,74,.3);background:rgba(245,216,74,.06)}
+.share-btn.dl:hover{background:rgba(245,216,74,.12);border-color:rgba(245,216,74,.5)}
+.share-btn.tw{border-color:rgba(29,161,242,.25);background:rgba(29,161,242,.05)}
+.share-btn.tw:hover{background:rgba(29,161,242,.12);border-color:rgba(29,161,242,.4)}
+.share-btn.wa{border-color:rgba(37,211,102,.25);background:rgba(37,211,102,.05)}
+.share-btn.wa:hover{background:rgba(37,211,102,.12);border-color:rgba(37,211,102,.4)}
+.share-btn.cp:hover{background:rgba(245,240,232,.08);border-color:rgba(245,240,232,.25)}
+.share-btn.gl{border-color:rgba(240,122,58,.25);background:rgba(240,122,58,.05)}
+.share-btn.gl:hover{background:rgba(240,122,58,.1);border-color:rgba(240,122,58,.4)}
 
-  .share-btn { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(245,240,232,.12); background: rgba(245,240,232,.04); cursor: none; transition: background .2s, border-color .2s, transform .15s; text-decoration: none; }
-  .share-btn:hover { transform: translateY(-2px); }
-  .share-btn-icon { font-size: 22px; flex-shrink: 0; }
-  .share-btn-text { display: flex; flex-direction: column; gap: 2px; }
-  .share-btn-title { font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--cream); }
-  .share-btn-sub { font-size: 11px; color: rgba(245,240,232,.35); font-family: var(--font-mono); }
+.bottom-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fadeUp .5s .6s both}
+.btn-outline{background:transparent;color:var(--cream);border:1px solid rgba(245,240,232,.2);padding:13px 26px;border-radius:100px;font-family:var(--fb);font-size:14px;font-weight:500;cursor:none;transition:border-color .2s,background .2s;display:flex;align-items:center;gap:8px;text-decoration:none}
+.btn-outline:hover{border-color:var(--orange);background:rgba(240,122,58,.08);color:var(--orange)}
+.btn-outline.dim{color:var(--muted);border-color:rgba(245,240,232,.1)}
+.btn-outline.dim:hover{color:var(--cream);border-color:rgba(245,240,232,.2);background:transparent}
 
-  .share-btn.download { border-color: rgba(245,216,74,.3); background: rgba(245,216,74,.06); }
-  .share-btn.download:hover { background: rgba(245,216,74,.12); border-color: rgba(245,216,74,.5); }
-  .share-btn.twitter { border-color: rgba(29,161,242,.3); background: rgba(29,161,242,.06); }
-  .share-btn.twitter:hover { background: rgba(29,161,242,.12); border-color: rgba(29,161,242,.5); }
-  .share-btn.whatsapp { border-color: rgba(37,211,102,.3); background: rgba(37,211,102,.06); }
-  .share-btn.whatsapp:hover { background: rgba(37,211,102,.12); border-color: rgba(37,211,102,.5); }
-  .share-btn.copy { border-color: rgba(245,240,232,.2); }
-  .share-btn.copy:hover { background: rgba(245,240,232,.08); border-color: rgba(245,240,232,.3); }
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--cream);color:var(--black);padding:14px 28px;border-radius:100px;font-family:var(--fb);font-size:14px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:500;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
 
-  .share-btn.downloading { opacity: .6; pointer-events: none; }
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
-  .bottom-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; animation: fadeUp .5s .6s both; }
-  .btn-remix { background: transparent; color: var(--cream); border: 1px solid rgba(245,240,232,.2); padding: 14px 28px; border-radius: 100px; font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: none; transition: border-color .2s,background .2s; display: flex; align-items: center; gap: 8px; }
-  .btn-remix:hover { border-color: var(--yellow); background: rgba(245,216,74,.08); color: var(--yellow); }
-  .btn-again { background: transparent; color: var(--muted); border: 1px solid rgba(245,240,232,.1); padding: 14px 28px; border-radius: 100px; font-family: var(--font-body); font-size: 14px; cursor: none; transition: color .2s,border-color .2s; display: flex; align-items: center; gap: 8px; }
-  .btn-again:hover { color: var(--cream); border-color: rgba(245,240,232,.2); }
-
-  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--cream); color: var(--black); padding: 14px 28px; border-radius: 100px; font-family: var(--font-body); font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,.3); transition: transform .4s cubic-bezier(.34,1.56,.64,1); z-index: 500; white-space: nowrap; }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-
-  @media (max-width: 680px) {
-    nav { padding: 16px 20px; }
-    main { padding: 100px 16px 60px; }
-    .comic-strip.panels-3 { grid-template-columns: 1fr; }
-    .panel { border-right: none; border-bottom: 2.5px solid #0a0a08; }
-    .panel:last-child { border-bottom: none; }
-  }
+@media(max-width:680px){
+  nav{padding:16px 20px}
+  main{padding:100px 16px 60px}
+  .comic-strip.panels-3{grid-template-columns:1fr}
+  .panel{border-right:none;border-bottom:2.5px solid #0a0a08}
+  .panel:last-child{border-bottom:none}
+  .share-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -162,7 +150,10 @@
 
 <nav>
   <a class="nav-logo" href="index.html">MELT<span>ING</span></a>
-  <a class="nav-back" href="gallery.html">🖼 Gallery</a>
+  <div class="nav-links">
+    <a class="nav-link" href="gallery.html">🖼 Gallery</a>
+    <a class="nav-link" href="index.html">← Home</a>
+  </div>
 </nav>
 
 <main>
@@ -170,7 +161,7 @@
   <!-- INPUT -->
   <div id="state-input">
     <div class="input-heading">
-      <h1>WHAT<br>HAPPENED<span class="wobble">🫠</span></h1>
+      <h1>WHAT HAPPENED<span class="wobble">🫠</span></h1>
       <p>Be as chaotic as you need. We can handle it.</p>
     </div>
     <div class="input-card">
@@ -199,7 +190,7 @@
 
   <!-- LOADING -->
   <div id="state-loading">
-    <div class="melt-loader">
+    <div>
       <span class="melt-face">🫠</span>
       <div class="melt-drips">
         <div class="drip"></div><div class="drip"></div><div class="drip"></div>
@@ -213,72 +204,57 @@
       <div class="loading-msg" id="msg-3">DRAWING THE PAIN</div>
       <div class="loading-msg" id="msg-4">ALMOST THERE...</div>
     </div>
-    <div class="loading-bar-wrap">
-      <div class="loading-bar" id="loading-bar"></div>
-    </div>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
   </div>
 
   <!-- OUTPUT -->
   <div id="state-output">
     <div class="output-header">
       <div class="mood-badge" id="mood-badge"></div>
-      <h2 id="output-title"></h2>
+      <div class="output-title" id="output-title"></div>
+      <div class="output-situation" id="output-situation"></div>
     </div>
 
-    <!-- This div gets captured as image -->
     <div class="comic-container">
       <div class="comic-card" id="comic-card">
         <div class="comic-strip panels-3" id="comic-strip"></div>
-        <div class="comic-footer">
+        <div class="comic-footer-bar">
           <div class="comic-footer-logo">MELT<span>ING</span></div>
-          <div class="comic-footer-url">melting.app</div>
+          <div class="comic-footer-tag">melting.app</div>
         </div>
       </div>
     </div>
 
     <div class="style-tag" id="style-tag"></div>
 
-    <!-- Share panel -->
     <div class="share-panel">
       <div class="share-panel-inner">
         <div class="share-label">Share your melt</div>
         <div class="share-grid">
-          <button class="share-btn download" id="download-btn" onclick="downloadImage()">
+          <button class="share-btn dl" id="download-btn" onclick="downloadImage()">
             <span class="share-btn-icon">⬇️</span>
-            <div class="share-btn-text">
-              <span class="share-btn-title">Save as image</span>
-              <span class="share-btn-sub">Download PNG</span>
-            </div>
+            <span><span class="share-btn-title">Save as image</span><span class="share-btn-sub">Download PNG</span></span>
           </button>
-          <button class="share-btn twitter" onclick="shareTwitter()">
+          <button class="share-btn tw" onclick="shareTwitter()">
             <span class="share-btn-icon">𝕏</span>
-            <div class="share-btn-text">
-              <span class="share-btn-title">Post to X</span>
-              <span class="share-btn-sub">Share the pain</span>
-            </div>
+            <span><span class="share-btn-title">Post to X</span><span class="share-btn-sub">Share the pain</span></span>
           </button>
-          <button class="share-btn whatsapp" onclick="shareWhatsApp()">
+          <button class="share-btn wa" onclick="shareWhatsApp()">
             <span class="share-btn-icon">💬</span>
-            <div class="share-btn-text">
-              <span class="share-btn-title">Send on WhatsApp</span>
-              <span class="share-btn-sub">Spread the chaos</span>
-            </div>
+            <span><span class="share-btn-title">Send on WhatsApp</span><span class="share-btn-sub">Spread the chaos</span></span>
           </button>
-          <button class="share-btn copy" onclick="copyLink()">
+          <button class="share-btn cp" onclick="copyLink()">
             <span class="share-btn-icon">🔗</span>
-            <div class="share-btn-text">
-              <span class="share-btn-title">Copy link</span>
-              <span class="share-btn-sub">Share anywhere</span>
-            </div>
+            <span><span class="share-btn-title">Copy link</span><span class="share-btn-sub">Share anywhere</span></span>
           </button>
         </div>
       </div>
     </div>
 
     <div class="bottom-actions">
-      <button class="btn-remix" onclick="remixMelt()">🎲 Remix it</button>
-      <button class="btn-again" onclick="resetToInput()">↩ New situation</button>
-      <a class="btn-again" href="gallery.html">🖼 See gallery</a>
+      <button class="btn-outline" onclick="remixMelt()">🎲 Remix it</button>
+      <a class="btn-outline" href="gallery.html">🖼 See gallery</a>
+      <button class="btn-outline dim" onclick="resetToInput()">↩ New situation</button>
     </div>
   </div>
 
@@ -290,36 +266,40 @@
 // CURSOR
 const cursor = document.getElementById('cursor');
 document.addEventListener('mousemove', e => { cursor.style.left=e.clientX+'px'; cursor.style.top=e.clientY+'px'; });
-document.querySelectorAll('a,button,textarea,.chip').forEach(el => {
-  el.addEventListener('mouseenter', () => cursor.classList.add('big'));
-  el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
-});
+function attachCursor() {
+  document.querySelectorAll('a,button,.chip').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+}
+attachCursor();
 
 // HELPERS
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 
 // MOOD ENGINE
 const MOOD_RULES = [
-  { mood:'STRESSED',     keys:['boss','deadline','meeting','work','interview','wifi','broke','crash','client','email','present','sprint','bug','deploy','code','server','office','slack','zoom','call','project','report','late','forgot','lost','miss'] },
-  { mood:'UNHINGED',     keys:['said','sent','autocorrect','wrong','accidentally','embarrass','waved','walked','laughed','texted','called','replied','posted','thought','assumed','showed','trip','slip','spill','sneeze','cough','yawn','stare','blank'] },
-  { mood:'RANT MODE',    keys:['why','always','never','seriously','cannot','again','every','time','people','hate','ridiculous','unfair','literally','actually','supposed','rules','policy','fine','whatever','nobody','everyone'] },
-  { mood:'SAD BUT FUNNY',keys:['alarm','sleep','tired','forgot','alone','rain','cold','dark','quiet','tried','fail','hope','expect','thought','plan','dream','wish','almost','nearly','finally','supposed'] },
+  {mood:'STRESSED',     keys:['boss','deadline','meeting','work','interview','wifi','broke','crash','client','email','present','sprint','bug','deploy','code','server','office','slack','zoom','call','project','report','late','forgot','lost','miss','stuck','broke']},
+  {mood:'UNHINGED',     keys:['said','sent','autocorrect','wrong','accidentally','embarrass','waved','walked','laughed','texted','called','replied','posted','thought','assumed','showed','trip','slip','spill','sneeze','cough','yawn','stare','blank','replied']},
+  {mood:'RANT MODE',    keys:['why','always','never','seriously','cannot','again','every','time','people','hate','ridiculous','unfair','literally','actually','supposed','rules','policy','fine','whatever','nobody','everyone','outrageous','unbelievable']},
+  {mood:'SAD BUT FUNNY',keys:['alarm','sleep','tired','forgot','alone','rain','cold','dark','quiet','tried','fail','hope','expect','thought','plan','dream','wish','almost','nearly','finally','supposed','bed','nap','sigh','somehow']},
 ];
 
 function detectMood(text) {
   const t = text.toLowerCase();
   const scores = {'STRESSED':0,'UNHINGED':0,'RANT MODE':0,'SAD BUT FUNNY':0};
-  scores['RANT MODE'] += (text.match(/!/g)||[]).length * 2;
-  scores['UNHINGED']  += (text.match(/\?/g)||[]).length;
-  scores['STRESSED']  += (text.match(/\b[A-Z]{3,}\b/g)||[]).length * 2;
-  MOOD_RULES.forEach(r => r.keys.forEach(k => { if (t.includes(k)) scores[r.mood] += 3; }));
-  return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  scores['RANT MODE']     += (text.match(/!/g)||[]).length * 2;
+  scores['UNHINGED']      += (text.match(/\?/g)||[]).length;
+  scores['STRESSED']      += (text.match(/\b[A-Z]{3,}\b/g)||[]).length * 2;
+  scores['SAD BUT FUNNY'] += (text.match(/\.\.\./g)||[]).length;
+  MOOD_RULES.forEach(r => r.keys.forEach(k => { if(t.includes(k)) scores[r.mood]+=3; }));
+  return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
 }
 
 // LIBRARY
 const LIBRARY = {
-  'STRESSED': {
-    moodColor:'#f07a3a', moodBg:'rgba(240,122,58,0.12)', style:'📋 Whiteboard Doodle mode',
+  'STRESSED':{
+    moodColor:'#f07a3a',moodBg:'rgba(240,122,58,0.12)',style:'📋 Whiteboard Doodle mode',
     titles:['LOCAL PERSON SIMPLY CANNOT CATCH A BREAK','AREA ADULT ENCOUNTERS YET ANOTHER OBSTACLE','THINGS GOING EXACTLY AS NOT PLANNED','PRODUCTIVITY LEVELS: CRITICAL FAILURE','ONE PERSON. TOO MANY PROBLEMS.','TODAY IN: ABSOLUTELY NOT','TECHNICAL DIFFICULTIES: EMOTIONAL EDITION','WHEN EVERYTHING CONSPIRES AGAINST YOU'],
     panels:[
       [{label:'Before',emoji:'🧑‍💻',bg:'#fffbea',speech:'I am so prepared',caption:'FAMOUS LAST WORDS.'},{label:'Before',emoji:'😤',bg:'#fffbea',speech:'Today will be different',caption:'NARRATOR: IT WAS NOT.'},{label:'Before',emoji:'☕',bg:'#fffbea',speech:null,caption:'THE CALM BEFORE THE STORM.'},{label:'Setup',emoji:'📅',bg:'#fffbea',speech:'I have a plan',caption:'CUTE.'},{label:'Scene 1',emoji:'💪',bg:'#fffbea',speech:'Got this.',caption:'CONFIDENCE: MAX.'}],
@@ -327,26 +307,26 @@ const LIBRARY = {
       [{label:'Current status',emoji:'🫠',bg:'#ffeaea',speech:'this is fine',caption:'THIS IS NOT FINE.'},{label:'Right now',emoji:'😶‍🌫️',bg:'#ffeaea',speech:null,caption:'DISSOCIATION SPEEDRUN.'},{label:'Reaction',emoji:'🙃',bg:'#ffeaea',speech:'haha cool',caption:'COPING MECHANISM ACTIVATED.'},{label:'Aftermath',emoji:'🤡',bg:'#ffeaea',speech:null,caption:'SEND HELP. OR PIZZA.'},{label:'Final form',emoji:'😑',bg:'#ffeaea',speech:'fine.',caption:'THE THOUSAND YARD STARE.'}],
     ]
   },
-  'UNHINGED': {
-    moodColor:'#3a6ef0', moodBg:'rgba(58,110,240,0.12)', style:'🤯 Emoji Native mode',
+  'UNHINGED':{
+    moodColor:'#3a6ef0',moodBg:'rgba(58,110,240,0.12)',style:'🤯 Emoji Native mode',
     titles:['LOCAL PERSON DOES THE UNTHINKABLE','AREA HUMAN ACHIEVES NEW LEVEL OF AWKWARD','SOCIAL CONTRACT: VIOLATED','A MASTERCLASS IN PUBLIC SELF-DESTRUCTION','THE MOMENT REPLAYING ON REPEAT AT 3AM','BRAIN TAKES THE DAY OFF','NORMAL HUMAN BEHAVIOUR (NOT)','WITNESS: ONE PERSON GOING FULLY FERAL'],
     panels:[
       [{label:'Before',emoji:'😌',bg:'#eaf4ff',speech:'I am a normal person',caption:'CONFIDENT. CAPABLE.'},{label:'Scene 1',emoji:'🚶',bg:'#eaf4ff',speech:null,caption:'JUST A PERSON. DOING THINGS.'},{label:'Before',emoji:'🙂',bg:'#eaf4ff',speech:'I have social skills',caption:'OR SO THEY THOUGHT.'},{label:'Setup',emoji:'😇',bg:'#eaf4ff',speech:null,caption:'INNOCENT. UNSUSPECTING.'},{label:'Pre-incident',emoji:'💅',bg:'#eaf4ff',speech:null,caption:'OPERATING AT FULL DELUSION.'}],
-      [{label:'The incident',emoji:'👀',bg:'#dfeeff',speech:null,caption:'WAIT. WAIT. WAIT.'},{label:'It happens',emoji:'🫣',bg:'#dfeeff',speech:'oh no',caption:'THE POINT OF NO RETURN.'},{label:'The moment',emoji:'🤦',bg:'#dfeeff',speech:null,caption:'AND SCENE.'},{label:'Uh oh',emoji:'😬',bg:'#dfeeff',speech:null,caption:'THE LOOK ON THEIR FACE.'},{label:'It occurs',emoji:'💀',bg:'#dfeeff',speech:'I did not just—',caption:'YOU DID.'}],
+      [{label:'The incident',emoji:'👀',bg:'#dfeeff',speech:null,caption:'WAIT. WAIT. WAIT.'},{label:'It happens',emoji:'🫣',bg:'#dfeeff',speech:'oh no',caption:'THE POINT OF NO RETURN.'},{label:'The moment',emoji:'🤦',bg:'#dfeeff',speech:null,caption:'AND SCENE.'},{label:'Uh oh',emoji:'😬',bg:'#dfeeff',speech:null,caption:'THE LOOK ON THEIR FACE.'},{label:'It occurs',emoji:'💀',bg:'#dfeeff',speech:"I did not just—",caption:'YOU DID.'}],
       [{label:'Aftermath',emoji:'🏃',bg:'#d0e4ff',speech:null,caption:'LEAVING THE COUNTRY NOW.'},{label:'Recovery',emoji:'🛌',bg:'#d0e4ff',speech:'I live here now',caption:'THE BED IS HOME.'},{label:'Coping',emoji:'😂',bg:'#d0e4ff',speech:'haha',caption:'LAUGH OR CRY. SAME THING.'},{label:'Moving on',emoji:'😶',bg:'#d0e4ff',speech:null,caption:'DELETED AND BLOCKING MYSELF.'},{label:'Aftermath',emoji:'🫥',bg:'#d0e4ff',speech:'anyway',caption:'NOTHING TO SEE HERE.'}],
     ]
   },
-  'RANT MODE': {
-    moodColor:'#e03a2a', moodBg:'rgba(224,58,42,0.12)', style:'💥 Glitch Collage mode',
+  'RANT MODE':{
+    moodColor:'#e03a2a',moodBg:'rgba(224,58,42,0.12)',style:'💥 Glitch Collage mode',
     titles:['THE AUDACITY. THE ABSOLUTE AUDACITY.','ONE PERSON. ONE RANT. NO NOTES.','INJUSTICE RECORDED FOR THE ARCHIVES','TODAY IN: WHY THOUGH','AN OPEN LETTER TO THE VOID','LOCAL PERSON REACHES THEIR LIMIT','THIS IS NOT WHAT WAS AGREED UPON','SOCIETY EVALUATED. SCORE: LOW.'],
     panels:[
       [{label:'The setup',emoji:'😤',bg:'#fff4f0',speech:'I just wanted one thing',caption:'A REASONABLE REQUEST.'},{label:'Before',emoji:'🙏',bg:'#fff4f0',speech:'please just this once',caption:'OPTIMISM: A MISTAKE.'},{label:'Expectations',emoji:'✨',bg:'#fff4f0',speech:'it should be simple',caption:'NARRATOR: IT WAS NOT.'},{label:'Setup',emoji:'🤞',bg:'#fff4f0',speech:null,caption:'HOPE ENTERS THE ROOM.'},{label:'Before',emoji:'😇',bg:'#fff4f0',speech:'I am being so reasonable',caption:'FORESHADOWING.'}],
-      [{label:'What happened',emoji:'🤡',bg:'#ffe8e0',speech:null,caption:'ENTER: THE CHAOS GOBLIN.'},{label:'The issue',emoji:'🚧',bg:'#ffe8e0',speech:null,caption:'OBSTRUCTION ACHIEVED.'},{label:'It happens',emoji:'🫠',bg:'#ffe8e0',speech:'you have got to be—',caption:'THEY GOT TO BE.'},{label:'The crime',emoji:'😱',bg:'#ffe8e0',speech:null,caption:'DOCUMENTED. LOGGED. UNFORGIVABLE.'},{label:'The moment',emoji:'🔥',bg:'#ffe8e0',speech:null,caption:'THE LAST STRAW LANDS.'}],
+      [{label:'What happened',emoji:'🤡',bg:'#ffe8e0',speech:null,caption:'ENTER: THE CHAOS GOBLIN.'},{label:'The issue',emoji:'🚧',bg:'#ffe8e0',speech:null,caption:'OBSTRUCTION ACHIEVED.'},{label:'It happens',emoji:'🫠',bg:'#ffe8e0',speech:"you've got to be—",caption:'THEY GOT TO BE.'},{label:'The crime',emoji:'😱',bg:'#ffe8e0',speech:null,caption:'DOCUMENTED. LOGGED. UNFORGIVABLE.'},{label:'The moment',emoji:'🔥',bg:'#ffe8e0',speech:null,caption:'THE LAST STRAW LANDS.'}],
       [{label:'Current status',emoji:'🌋',bg:'#ffd0c0',speech:'I am so calm.',caption:'SHE IS NOT CALM.'},{label:'Right now',emoji:'😡',bg:'#ffd0c0',speech:null,caption:'COMPOSURE: LEFT THE BUILDING.'},{label:'Reaction',emoji:'🫡',bg:'#ffd0c0',speech:'noted.',caption:'IT HAS BEEN NOTED.'},{label:'End state',emoji:'💅',bg:'#ffd0c0',speech:null,caption:'UNBOTHERED. (VERY BOTHERED.)'},{label:'Final form',emoji:'😶‍🌫️',bg:'#ffd0c0',speech:null,caption:'ASCENDED BEYOND CARING.'}],
     ]
   },
-  'SAD BUT FUNNY': {
-    moodColor:'#2abf6e', moodBg:'rgba(42,191,110,0.12)', style:'📰 Comic Strip mode',
+  'SAD BUT FUNNY':{
+    moodColor:'#2abf6e',moodBg:'rgba(42,191,110,0.12)',style:'📰 Comic Strip mode',
     titles:['A TRAGEDY IN THREE ACTS','LOCAL PERSON TRIES THEIR BEST (BLESS THEM)','HOPE: A CAUTIONARY TALE','THE UNIVERSE SAYS: LOL NO','PLANS MADE. PLANS DESTROYED.','PARTICIPATION AWARD: AWARDED','ALMOST. SO CLOSE. NOT QUITE.','A STORY ABOUT TRYING'],
     panels:[
       [{label:'Act I',emoji:'🙂',bg:'#eafff0',speech:'Today will be different',caption:'SPOILER: IT WAS NOT.'},{label:'Before',emoji:'🌱',bg:'#eafff0',speech:null,caption:'GROWTH MINDSET ENGAGED.'},{label:'Morning',emoji:'☀️',bg:'#eafff0',speech:'New day, new me',caption:'SAME ME. UNFORTUNATELY.'},{label:'Setup',emoji:'🫶',bg:'#eafff0',speech:null,caption:'FULL OF HOPE AND DREAMS.'},{label:'Act I',emoji:'🤩',bg:'#eafff0',speech:'this time for sure',caption:'THIS TIME WAS NOT SURE.'}],
@@ -357,10 +337,7 @@ const LIBRARY = {
 };
 
 // STATE
-let currentMood = null;
-let currentTitle = '';
-let currentSituation = '';
-let msgInterval = null;
+let currentMood=null, currentTitle='', currentSituation='', msgInterval=null;
 
 // INPUT
 function updateCount() {
@@ -371,6 +348,7 @@ function updateCount() {
   el.classList.toggle('warn', count>400);
   document.getElementById('melt-btn').disabled = ta.value.trim().length < 5;
 }
+
 function useExample(el) {
   const ta = document.getElementById('situation-input');
   ta.value = el.textContent;
@@ -378,7 +356,18 @@ function useExample(el) {
   ta.focus();
 }
 
-// MAIN
+// Prefill from landing page
+window.addEventListener('load', () => {
+  const prefill = sessionStorage.getItem('melting_prefill');
+  if (prefill) {
+    const ta = document.getElementById('situation-input');
+    ta.value = prefill;
+    ta.dispatchEvent(new Event('input'));
+    sessionStorage.removeItem('melting_prefill');
+  }
+});
+
+// MAIN FLOW
 function startMelting() {
   currentSituation = document.getElementById('situation-input').value.trim();
   if (!currentSituation) return;
@@ -387,11 +376,11 @@ function startMelting() {
   runLoadingAnim();
   setTimeout(() => {
     stopLoadingAnim();
-    const builtPanels = buildOutput(currentMood);
-    saveToGallery(currentMood, currentTitle, currentSituation, builtPanels);
+    const panels = buildOutput(currentMood);
+    saveToGallery(currentMood, currentTitle, currentSituation, panels);
     showState('output');
     setTimeout(() => showToast('🫠 Saved to the gallery!'), 900);
-  }, 2800);
+  }, 2600);
 }
 
 function remixMelt() {
@@ -402,177 +391,146 @@ function remixMelt() {
     stopLoadingAnim();
     buildOutput(currentMood);
     showState('output');
-  }, 1800);
+  }, 1600);
 }
 
-// LOADING
+// LOADING ANIM
 function runLoadingAnim() {
-  const msgs = ['msg-0','msg-1','msg-2','msg-3','msg-4'];
-  let idx = 0;
-  msgs.forEach(id => document.getElementById(id).classList.remove('active'));
+  const msgs=['msg-0','msg-1','msg-2','msg-3','msg-4'];
+  let idx=0;
+  msgs.forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById(msgs[0]).classList.add('active');
-  document.getElementById('loading-bar').style.width = '8%';
-  msgInterval = setInterval(() => {
+  document.getElementById('loading-bar').style.width='8%';
+  msgInterval=setInterval(()=>{
     document.getElementById(msgs[idx]).classList.remove('active');
-    idx = Math.min(idx+1, msgs.length-1);
+    idx=Math.min(idx+1,msgs.length-1);
     document.getElementById(msgs[idx]).classList.add('active');
-    document.getElementById('loading-bar').style.width = ((idx+1)/msgs.length*90)+'%';
-  }, 520);
+    document.getElementById('loading-bar').style.width=((idx+1)/msgs.length*90)+'%';
+  },520);
 }
 function stopLoadingAnim() {
-  if (msgInterval) { clearInterval(msgInterval); msgInterval = null; }
-  document.getElementById('loading-bar').style.width = '100%';
+  if(msgInterval){clearInterval(msgInterval);msgInterval=null;}
+  document.getElementById('loading-bar').style.width='100%';
 }
 
-// BUILD
+// BUILD COMIC
 function buildOutput(mood) {
   const lib = LIBRARY[mood];
+
   const badge = document.getElementById('mood-badge');
   badge.textContent = mood;
-  badge.style.background = lib.moodBg;
-  badge.style.color = lib.moodColor;
-  badge.style.border = `1px solid ${lib.moodColor}55`;
+  badge.style.cssText=`background:${lib.moodBg};color:${lib.moodColor};border:1px solid ${lib.moodColor}55`;
 
   currentTitle = pick(lib.titles);
   document.getElementById('output-title').textContent = currentTitle;
+  document.getElementById('output-situation').textContent = '"'+currentSituation+'"';
   document.getElementById('style-tag').textContent = lib.style;
 
-  const panels = lib.panels.map(pool => pick(pool));
+  const panels = lib.panels.map(pool=>pick(pool));
   const strip = document.getElementById('comic-strip');
-  strip.className = 'comic-strip panels-3';
-  strip.innerHTML = '';
+  strip.className='comic-strip panels-3';
+  strip.innerHTML='';
 
-  panels.forEach(p => {
-    const panel = document.createElement('div');
-    panel.className = 'panel';
-    panel.style.background = p.bg;
-    panel.innerHTML = `
+  panels.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='panel';
+    el.style.background=p.bg;
+    el.innerHTML=`
       <div class="panel-top">
         <div class="panel-label">${p.label}</div>
         <div class="panel-art">
           <span style="font-size:56px">${p.emoji}</span>
-          ${p.speech ? `<div class="panel-speech">${p.speech}</div>` : ''}
+          ${p.speech?`<div class="panel-speech">${p.speech}</div>`:''}
         </div>
       </div>
-      <div class="panel-caption">${p.caption}</div>
-    `;
-    strip.appendChild(panel);
+      <div class="panel-caption">${p.caption}</div>`;
+    strip.appendChild(el);
   });
 
-  setTimeout(() => {
-    document.getElementById('loading-bar').style.width = '0%';
-    ['msg-0','msg-1','msg-2','msg-3','msg-4'].forEach((id,i) => {
-      document.getElementById(id).classList.toggle('active', i===0);
-    });
-  }, 600);
+  // reset loading for next time
+  setTimeout(()=>{
+    document.getElementById('loading-bar').style.width='0%';
+    ['msg-0','msg-1','msg-2','msg-3','msg-4'].forEach((id,i)=>document.getElementById(id).classList.toggle('active',i===0));
+  },600);
+
+  attachCursor();
   return panels;
-}
-
-// ── SHARE & EXPORT ──
-async function downloadImage() {
-  const btn = document.getElementById('download-btn');
-  btn.classList.add('downloading');
-  btn.querySelector('.share-btn-title').textContent = 'Generating...';
-
-  try {
-    const card = document.getElementById('comic-card');
-    const canvas = await html2canvas(card, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      onclone: (doc) => {
-        // Make sure fonts load in clone
-        doc.querySelectorAll('.panel-caption').forEach(el => {
-          el.style.fontFamily = "'Courier New', monospace";
-        });
-      }
-    });
-
-    const link = document.createElement('a');
-    const slug = currentTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40);
-    link.download = `melting-${slug}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    showToast('🖼️ Comic saved!');
-  } catch(e) {
-    showToast('⚠️ Could not export — try screenshotting!');
-  }
-
-  btn.classList.remove('downloading');
-  btn.querySelector('.share-btn-title').textContent = 'Save as image';
-}
-
-function shareTwitter() {
-  const text = `${currentTitle} 🫠\n\nMade with Melting — describe the chaos, get a comic.\n\n`;
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
-  window.open(url, '_blank');
-}
-
-function shareWhatsApp() {
-  const text = `${currentTitle} 🫠\n\nMade on Melting: ${window.location.href}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-}
-
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href)
-    .then(() => showToast('🔗 Link copied!'))
-    .catch(() => showToast('📋 Copy the URL from your browser!'));
-}
-
-// STATE
-function showState(s) {
-  document.getElementById('state-input').style.display   = 'none';
-  document.getElementById('state-loading').style.display = 'none';
-  document.getElementById('state-output').style.display  = 'none';
-  if (s==='input')   document.getElementById('state-input').style.display   = 'block';
-  if (s==='loading') document.getElementById('state-loading').style.display = 'flex';
-  if (s==='output')  document.getElementById('state-output').style.display  = 'flex';
 }
 
 // SAVE TO GALLERY
 function saveToGallery(mood, title, situation, panels) {
   try {
-    const lib = LIBRARY[mood];
-    const melts = JSON.parse(localStorage.getItem('melting_gallery') || '[]');
-    const newMelt = {
-      id: 'melt_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-      mood,
-      moodColor: lib.moodColor,
-      moodBg: lib.moodBg,
-      title,
-      situation,
-      panels: panels.map(p => ({ emoji: p.emoji, bg: p.bg, caption: p.caption })),
-      reactions: { fire: 0, skull: 0, cry: 0 },
-      ts: Date.now()
-    };
-    melts.unshift(newMelt);
-    // keep max 100 melts
-    if (melts.length > 100) melts.splice(100);
-    localStorage.setItem('melting_gallery', JSON.stringify(melts));
-  } catch(e) { /* storage full or unavailable */ }
+    const lib=LIBRARY[mood];
+    const melts=JSON.parse(localStorage.getItem('melting_gallery')||'[]');
+    melts.unshift({
+      id:'melt_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      mood,moodColor:lib.moodColor,moodBg:lib.moodBg,
+      title,situation,
+      panels:panels.map(p=>({emoji:p.emoji,bg:p.bg,caption:p.caption})),
+      reactions:{fire:0,skull:0,cry:0},
+      ts:Date.now()
+    });
+    if(melts.length>100) melts.splice(100);
+    localStorage.setItem('melting_gallery',JSON.stringify(melts));
+  } catch(e){}
+}
+
+// EXPORT
+async function downloadImage() {
+  const btn=document.getElementById('download-btn');
+  const titleEl=btn.querySelector('.share-btn-title');
+  titleEl.textContent='Generating...';
+  btn.style.pointerEvents='none';
+  try {
+    const canvas=await html2canvas(document.getElementById('comic-card'),{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    const a=document.createElement('a');
+    a.download=`melting-${currentTitle.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)}.png`;
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    showToast('🖼️ Comic saved!');
+  } catch(e){ showToast('⚠️ Export failed — try a screenshot!'); }
+  titleEl.textContent='Save as image';
+  btn.style.pointerEvents='';
+}
+
+function shareTwitter() {
+  const text=`${currentTitle} 🫠\n\nMade with Melting — describe the chaos, get a comic.\n`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`,'_blank');
+}
+
+function shareWhatsApp() {
+  window.open(`https://wa.me/?text=${encodeURIComponent(currentTitle+' 🫠\n\n'+window.location.href)}`,'_blank');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href)
+    .then(()=>showToast('🔗 Link copied!'))
+    .catch(()=>showToast('📋 Copy the URL from your browser!'));
+}
+
+// STATE MANAGER
+function showState(s) {
+  document.getElementById('state-input').style.display   = s==='input'   ? 'block':'none';
+  document.getElementById('state-loading').style.display = s==='loading' ? 'flex' :'none';
+  document.getElementById('state-output').style.display  = s==='output'  ? 'flex' :'none';
 }
 
 function resetToInput() {
-  document.getElementById('situation-input').value = '';
-  document.getElementById('char-count').textContent = '0 / 500';
-  document.getElementById('melt-btn').disabled = true;
-  currentMood = null; currentTitle = '';
+  document.getElementById('situation-input').value='';
+  document.getElementById('char-count').textContent='0 / 500';
+  document.getElementById('melt-btn').disabled=true;
+  currentMood=null; currentTitle=''; currentSituation='';
   showState('input');
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-document.getElementById('situation-input').addEventListener('keydown', e => {
-  if (e.key==='Enter' && !e.shiftKey) {
-    e.preventDefault();
-    if (!document.getElementById('melt-btn').disabled) startMelting();
-  }
+document.getElementById('situation-input').addEventListener('keydown', e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!document.getElementById('melt-btn').disabled)startMelting();}
 });
 </script>
 </body>
