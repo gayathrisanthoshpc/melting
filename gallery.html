@@ -1,10 +1,20 @@
+Gallery · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Melting — The Wall of Melts</title>
-<meta name="description" content="Every breakdown. Every cringe. Every why me. The public gallery of melts.">
+<meta name="description" content="Every breakdown. Every cringe. Every 'why me.' Browse the public gallery of animated meltdowns.">
+<meta name="theme-color" content="#0a0a08">
+<meta property="og:title" content="Melting 🫠 — The Wall of Melts">
+<meta property="og:description" content="Every breakdown. Every cringe. Every 'why me.' Browse the gallery.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫠</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -21,10 +31,10 @@
 html,body{min-height:100%}
 body{background:var(--black);color:var(--cream);font-family:var(--fb);overflow-x:hidden;cursor:none}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:900;opacity:.3}
-
+ 
 .cursor{position:fixed;width:16px;height:16px;background:var(--yellow);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:difference}
 .cursor.big{width:50px;height:50px}
-
+ 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 40px;border-bottom:1px solid rgba(245,240,232,.06);background:rgba(10,10,8,.88);backdrop-filter:blur(12px)}
 .nav-logo{font-family:var(--fd);font-size:24px;letter-spacing:2px;color:var(--cream);text-decoration:none}
@@ -34,7 +44,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .nav-link:hover{color:var(--cream)}
 .nav-cta{background:var(--orange);color:white;font-size:13px;font-weight:500;padding:10px 20px;border-radius:100px;text-decoration:none;transition:background .2s;cursor:none}
 .nav-cta:hover{background:var(--red)}
-
+ 
 /* HERO */
 .hero{padding:140px 40px 50px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--fd);font-size:clamp(160px,24vw,300px);color:transparent;-webkit-text-stroke:1px rgba(245,240,232,.04);pointer-events:none;white-space:nowrap;line-height:1;animation:bgFloat 10s ease-in-out infinite}
@@ -46,7 +56,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .hero-stats{display:flex;gap:16px;flex-wrap:wrap}
 .hero-stat{display:inline-flex;align-items:center;gap:8px;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);border-radius:100px;padding:7px 16px;font-size:13px;color:rgba(245,240,232,.5);font-family:var(--fm)}
 .hero-stat strong{color:var(--yellow)}
-
+ 
 /* FILTERS */
 .filter-bar{position:sticky;top:72px;z-index:50;background:rgba(10,10,8,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(245,240,232,.06);padding:14px 40px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .filter-btn{background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.1);border-radius:100px;padding:8px 18px;font-size:13px;color:rgba(245,240,232,.5);cursor:none;transition:all .2s;font-family:var(--fb)}
@@ -59,17 +69,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .sep{width:1px;height:22px;background:rgba(245,240,232,.1);margin:0 2px;flex-shrink:0}
 .sort-btn{background:transparent;border:none;font-size:13px;color:rgba(245,240,232,.35);cursor:none;transition:color .2s;font-family:var(--fb);padding:8px 10px}
 .sort-btn:hover,.sort-btn.active{color:var(--cream)}
-
+ 
 /* GRID */
 .gallery-wrap{padding:32px 40px 80px}
 .gallery-grid{columns:3 280px;gap:20px}
-
+ 
 /* CARD */
 .melt-card{break-inside:avoid;margin-bottom:20px;animation:cardIn .4s both}
 @keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .melt-card-inner{background:rgba(245,240,232,.04);border:1px solid rgba(245,240,232,.09);border-radius:16px;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s}
 .melt-card-inner:hover{border-color:rgba(245,240,232,.2);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.35)}
-
+ 
 /* Mini comic */
 .mini-comic{background:white;display:grid}
 .mini-comic.p3{grid-template-columns:2fr 1fr 1fr}
@@ -78,7 +88,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .mini-panel:last-child{border-right:none}
 .mini-panel-art{flex:1;display:flex;align-items:center;justify-content:center;font-size:30px;padding:10px 4px}
 .mini-panel-cap{background:#0a0a08;color:#f5d84a;font-family:'Courier New',monospace;font-size:7px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px;padding:5px 7px;line-height:1.3}
-
+ 
 /* Card body */
 .melt-card-body{padding:14px 16px 12px}
 .card-mood{display:inline-flex;padding:3px 10px;border-radius:100px;font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
@@ -86,14 +96,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .card-situation{font-size:12px;color:rgba(245,240,232,.38);line-height:1.5;font-family:var(--fs);font-style:italic;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card-footer{display:flex;align-items:center;justify-content:space-between}
 .card-time{font-size:10px;color:rgba(245,240,232,.18);font-family:var(--fm)}
-
+ 
 /* Reactions */
 .reactions{display:flex;gap:5px}
 .rxn{display:flex;align-items:center;gap:4px;background:rgba(245,240,232,.05);border:1px solid rgba(245,240,232,.08);border-radius:100px;padding:4px 9px;font-size:12px;color:rgba(245,240,232,.4);cursor:none;transition:all .2s}
 .rxn:hover{background:rgba(245,240,232,.1);color:var(--cream);transform:scale(1.05)}
 .rxn.on{background:rgba(245,216,74,.12);border-color:rgba(245,216,74,.3);color:var(--yellow)}
 .rxn-count{font-size:10px;font-family:var(--fm)}
-
+ 
 /* EMPTY */
 .empty{text-align:center;padding:80px 40px}
 .empty-emoji{font-size:80px;display:block;margin-bottom:20px;animation:emptyWobble 3s ease-in-out infinite}
@@ -102,24 +112,43 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .empty p{font-family:var(--fs);font-style:italic;color:rgba(245,240,232,.4);font-size:18px;margin-bottom:28px}
 .btn-go{background:var(--orange);color:white;font-family:var(--fd);font-size:22px;letter-spacing:1px;padding:16px 40px;border-radius:100px;text-decoration:none;transition:background .2s,transform .15s;display:inline-flex;align-items:center;gap:10px}
 .btn-go:hover{background:var(--red);transform:translateY(-2px)}
-
+ 
 /* TOAST */
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--cream);color:var(--black);padding:14px 28px;border-radius:100px;font-family:var(--fb);font-size:14px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:500}
 .toast.show{transform:translateX(-50%) translateY(0)}
-
+ 
+@media(hover:none){body{cursor:auto}.cursor{display:none}}
+ 
 @media(max-width:768px){
-  nav{padding:16px 20px}
-  .hero{padding:120px 20px 40px}
-  .filter-bar{padding:12px 20px;top:64px}
-  .gallery-wrap{padding:24px 20px 60px}
+  nav{padding:14px 16px}
+  .nav-link{font-size:12px}
+  .nav-cta{font-size:12px;padding:8px 14px}
+  .hero{padding:110px 20px 36px}
+  .hero h1{font-size:clamp(52px,14vw,90px)}
+  .hero-sub{font-size:16px}
+  .hero-stats{gap:12px;flex-wrap:wrap}
+  .filter-bar{padding:10px 16px;top:60px;gap:6px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .filter-btn{white-space:nowrap;flex-shrink:0;padding:7px 14px;font-size:12px}
+  .sort-sep{display:none}
+  .sort-btn{font-size:12px;flex-shrink:0}
+  .gallery-wrap{padding:20px 14px 60px}
   .gallery-grid{columns:1}
+  .card-title{font-size:15px}
+  .mini-panel{min-height:88px}
+  .mini-panel-art{font-size:24px}
+  .empty h2{font-size:36px}
+  .toast{font-size:13px;padding:12px 18px;bottom:16px;max-width:88vw;text-align:center;white-space:normal}
+}
+@media(max-width:400px){
+  .hero h1{font-size:13vw}
+  .nav-cta{display:none}
 }
 </style>
 </head>
 <body>
-
+ 
 <div class="cursor" id="cursor"></div>
-
+ 
 <nav>
   <a class="nav-logo" href="index.html">MELT<span>ING</span></a>
   <div class="nav-right">
@@ -127,7 +156,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <a class="nav-cta" href="generator.html">+ New melt</a>
   </div>
 </nav>
-
+ 
 <section class="hero">
   <div class="hero-bg">WALL</div>
   <p class="hero-tag">The gallery</p>
@@ -138,7 +167,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <div class="hero-stat"><strong id="hot-count">0</strong> reactions today</div>
   </div>
 </section>
-
+ 
 <div class="filter-bar">
   <button class="filter-btn active" onclick="setFilter('all',this)">All melts</button>
   <button class="filter-btn f-s"   onclick="setFilter('STRESSED',this)">😤 Stressed</button>
@@ -149,7 +178,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   <button class="sort-btn active" id="sort-new" onclick="setSort('new',this)">Newest</button>
   <button class="sort-btn"        id="sort-hot" onclick="setSort('hot',this)">🔥 Hottest</button>
 </div>
-
+ 
 <div class="gallery-wrap">
   <div class="gallery-grid" id="gallery-grid"></div>
   <div class="empty" id="empty-state" style="display:none">
@@ -159,9 +188,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <a class="btn-go" href="generator.html">🫠 Start melting</a>
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 // CURSOR
 const cursor = document.getElementById('cursor');
@@ -173,12 +202,12 @@ function bindCursor() {
   });
 }
 bindCursor();
-
+ 
 // STORAGE
 const STORAGE_KEY = 'melting_gallery';
 function getMelts() { try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch{return[];} }
 function saveMelts(m) { localStorage.setItem(STORAGE_KEY, JSON.stringify(m)); }
-
+ 
 // SEED demo data if empty
 function seedIfEmpty() {
   if (getMelts().length) return;
@@ -192,11 +221,11 @@ function seedIfEmpty() {
   ];
   saveMelts(demos);
 }
-
+ 
 // STATE
 let currentFilter='all', currentSort='new';
 let reacted = JSON.parse(localStorage.getItem('melting_reacted')||'{}');
-
+ 
 function setFilter(f,btn) {
   currentFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
@@ -209,7 +238,7 @@ function setSort(s,btn) {
   btn.classList.add('active');
   render();
 }
-
+ 
 function timeAgo(ts) {
   const d=Date.now()-ts, m=Math.floor(d/60000);
   if(m<1) return 'just now';
@@ -218,41 +247,41 @@ function timeAgo(ts) {
   if(h<24) return h+'h ago';
   return Math.floor(h/24)+'d ago';
 }
-
+ 
 function totalRxn(r) { return (r.fire||0)+(r.skull||0)+(r.cry||0); }
-
+ 
 function render() {
   let melts=getMelts();
   const all=melts;
-
+ 
   if(currentFilter!=='all') melts=melts.filter(m=>m.mood===currentFilter);
   if(currentSort==='hot') melts=[...melts].sort((a,b)=>totalRxn(b.reactions)-totalRxn(a.reactions));
   else melts=[...melts].sort((a,b)=>b.ts-a.ts);
-
+ 
   // stats
   document.getElementById('total-count').textContent=all.length;
   const todayRxns=all.reduce((s,m)=>s+totalRxn(m.reactions),0);
   document.getElementById('hot-count').textContent=todayRxns;
-
+ 
   const grid=document.getElementById('gallery-grid');
   const empty=document.getElementById('empty-state');
-
+ 
   if(!melts.length) { grid.style.display='none'; empty.style.display='block'; return; }
   grid.style.display=''; empty.style.display='none';
   grid.innerHTML='';
-
+ 
   melts.forEach((m,i)=>{
     const card=document.createElement('div');
     card.className='melt-card';
     card.style.animationDelay=(i*.04)+'s';
-
+ 
     const r=reacted[m.id]||{};
     const panels=m.panels.map(p=>`
       <div class="mini-panel" style="background:${p.bg}">
         <div class="mini-panel-art">${p.emoji}</div>
         <div class="mini-panel-cap">${p.caption}</div>
       </div>`).join('');
-
+ 
     card.innerHTML=`
       <div class="melt-card-inner">
         <div class="mini-comic p${m.panels.length}">${panels}</div>
@@ -272,7 +301,7 @@ function render() {
       </div>`;
     grid.appendChild(card);
   });
-
+ 
   // bind reactions via delegation
   grid.querySelectorAll('.rxn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -280,17 +309,17 @@ function render() {
       react(id,type,btn);
     });
   });
-
+ 
   bindCursor();
 }
-
+ 
 function react(id,type,btn) {
   const melts=getMelts();
   const m=melts.find(x=>x.id===id);
   if(!m) return;
   if(!reacted[id]) reacted[id]={};
   const countEl=btn.querySelector('.rxn-count');
-
+ 
   if(reacted[id][type]) {
     m.reactions[type]=Math.max(0,(m.reactions[type]||0)-1);
     delete reacted[id][type];
@@ -306,17 +335,17 @@ function react(id,type,btn) {
   saveMelts(melts);
   localStorage.setItem('melting_reacted',JSON.stringify(reacted));
 }
-
+ 
 function showToast(msg) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
-
+ 
 // INIT
 seedIfEmpty();
 render();
-
+ 
 // Live updates when generator saves
 window.addEventListener('storage', e=>{ if(e.key===STORAGE_KEY) render(); });
 </script>

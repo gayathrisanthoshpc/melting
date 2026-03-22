@@ -4,10 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Melting — Describe the chaos. We animate the meltdown.</title>
-<meta name="description" content="Type your situation. Get a comic strip. Share the meltdown. Free forever.">
-<meta property="og:title" content="Melting 🫠">
-<meta property="og:description" content="Describe the chaos. We animate the meltdown.">
+<meta name="description" content="Type your situation. Get an animated comic strip. Share the meltdown. Free forever.">
+<meta name="theme-color" content="#f07a3a">
+<meta property="og:title" content="Melting 🫠 — Describe the chaos. We animate the meltdown.">
+<meta property="og:description" content="Type your situation. Get an animated comic strip. Share it everywhere. Free forever.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://melting.vercel.app">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Melting 🫠">
+<meta name="twitter:description" content="Describe the chaos. We animate the meltdown.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫠</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -172,21 +180,57 @@ footer p{font-size:12px;color:rgba(245,240,232,.2)}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
+/* disable custom cursor on touch */
+@media(hover:none){body{cursor:auto}.cursor{display:none}}
+
 /* RESPONSIVE */
 @media(max-width:768px){
-  nav{padding:16px 20px}
+  nav{padding:14px 16px}
   .nav-link{display:none}
-  .hero,.how,.demo,.styles,.gallery-preview,.cta{padding-left:20px;padding-right:20px}
+  .nav-cta{font-size:12px;padding:9px 16px}
+  .hero{padding:100px 20px 60px;min-height:auto}
+  .hero-title{font-size:clamp(60px,18vw,110px)}
+  .hero-emoji{font-size:clamp(44px,14vw,80px);margin-left:8px}
+  .hero-sub{font-size:16px;margin-top:20px}
+  .hero-actions{margin-top:28px;gap:12px}
+  .btn-primary{padding:13px 24px;font-size:14px}
+  .hero-scroll{display:none}
+  .blob-1{width:180px;height:180px;opacity:.3}
+  .blob-2,.blob-3{display:none}
+  .how,.demo,.styles,.gallery-preview,.cta{padding-left:20px;padding-right:20px}
+  .how{padding-top:60px;padding-bottom:60px}
   .steps{grid-template-columns:1fr}
-  .step{border-left:none;border-top:1px solid rgba(245,240,232,.08)}
+  .step{border-left:none;border-top:1px solid rgba(245,240,232,.08);padding:28px 20px}
   .step:first-child{border-top:none}
   .step-arrow{display:none}
+  .demo{padding-top:60px;padding-bottom:60px}
+  .demo-title{font-size:clamp(36px,10vw,60px);margin-bottom:32px}
   .demo-comic{grid-template-columns:1fr}
   .d-panel{border-right:none;border-bottom:2px solid var(--black)}
   .d-panel:last-child{border-bottom:none}
+  .d-panel-body{height:140px}
+  .demo-input-area{margin-top:28px}
+  .demo-input-row{flex-direction:column;border-radius:16px;gap:0}
+  .demo-input-row input{padding:14px 18px;border-radius:14px 14px 0 0;border:none;outline:none;font-size:15px}
+  .demo-input-row button{border-radius:0 0 14px 14px;padding:13px;font-size:20px}
+  .styles{padding-top:60px;padding-bottom:60px}
   .styles-grid{grid-template-columns:1fr}
-  .preview-grid{grid-template-columns:1fr}
-  footer{flex-direction:column;align-items:flex-start;gap:12px}
+  .style-card{padding:28px 20px}
+  .gallery-preview{padding-top:60px;padding-bottom:60px}
+  .gallery-preview-title{font-size:clamp(40px,10vw,60px)}
+  .preview-grid{grid-template-columns:1fr;gap:12px}
+  .cta{padding-top:80px;padding-bottom:80px}
+  .cta h2{font-size:clamp(52px,14vw,90px)}
+  .cta p{font-size:16px}
+  .waitlist-form{flex-direction:column;border-radius:16px;box-shadow:4px 4px 0 var(--black)}
+  .waitlist-form input{border-radius:14px 14px 0 0;padding:16px 20px}
+  .waitlist-form button{border-radius:0 0 14px 14px;padding:14px}
+  footer{flex-direction:column;align-items:flex-start;gap:12px;padding:28px 20px}
+  .footer-links{flex-wrap:wrap;gap:16px}
+}
+@media(max-width:400px){
+  .hero-title{font-size:16vw}
+  .nav-cta{display:none}
 }
 </style>
 </head>
@@ -362,6 +406,8 @@ footer p{font-size:12px;color:rgba(245,240,232,.2)}
 
 <script>
 const cursor = document.getElementById('cursor');
+// Hide cursor on touch devices
+if ('ontouchstart' in window) { cursor.style.display='none'; document.body.style.cursor='auto'; }
 document.addEventListener('mousemove', e => { cursor.style.left=e.clientX+'px'; cursor.style.top=e.clientY+'px'; });
 document.querySelectorAll('a,button,input,.style-card').forEach(el => {
   el.addEventListener('mouseenter', () => cursor.classList.add('big'));
